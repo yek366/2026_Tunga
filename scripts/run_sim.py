@@ -4,15 +4,15 @@ import subprocess
 import sys
 import glob
 
-# Terminal renk kodlari (Juri ciktilari icin)
+# Terminal renk kodlari
 GREEN = '\033[92m'
 RED = '\033[91m'
 RESET = '\033[0m'
 
 def run_simulation():
-    print("=== Teknofest 2026 CV32E40P UVM Otomasyon Betiği ===\n")
+    print("=== Teknofest 2026 CV32E40P UVM Otomasyon Betiği (DSim) ===\n")
     
-    # Proje yollarini dinamik olarak bul
+    # Proje yollarini bul
     script_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.abspath(os.path.join(script_dir, ".."))
     
@@ -20,89 +20,63 @@ def run_simulation():
     tb_dir = os.path.join(project_root, "tb")
     sim_dir = os.path.join(project_root, "sim")
     
-    # sim klasoru yoksa olustur
     os.makedirs(sim_dir, exist_ok=True)
 
-    # RTL dosyalarini bul (.v ve .sv)
+    # Dosyalari topla
     rtl_files = glob.glob(os.path.join(rtl_dir, "*.v")) + glob.glob(os.path.join(rtl_dir, "*.sv"))
-    tb_cpp = os.path.join(tb_dir, "sim_main.cpp")
+    tb_sv = os.path.join(tb_dir, "tb_tunga_soc.sv")
     
-    if not rtl_files:
-        print(f"{RED}Uyari: rtl/ klasorunde RTL dosyasi bulunamadi. Derleme hata verebilir.{RESET}")
+    if not os.path.exists(tb_sv):
+        print(f"{RED}Hata: Yuşa'nın yazdığı testbench dosyası ({tb_sv}) bulunamadı!{RESET}")
+        sys.exit(1)
 
-    # ==========================================
-    # 1. ADIM: Verilator ile Derleme (Compile)
-    # ==========================================
-    print("[1/2] Verilator ile derleme başlatılıyor...")
+    print("[1/1] Metrics DSim ile Derleme ve Simülasyon yürütülüyor...\n")
+    print("-" * 50)
     
-    # top module adini burada "top" varsayiyoruz, farkliysa asagidaki satiri duzenleyin.
-    top_module_isim = "top"
+    top_module_isim = "tb_tunga_soc"
     
-    verilator_cmd = [
-        "verilator",
-        "-Wall",
-        "-Wno-lint",     # Lint uyarilarini bastir
-        "-Wno-fatal",    # Uyarilari hataya cevirmeyi engelle
-        "--cc",          # C++ ciktisi uret
-        "--exe",         # Calistirilabilir dosya (executable) uret
-        "--build",       # Otomatik derle
-        "-Mdir", os.path.join(sim_dir, "obj_dir"), # Cikti dizini
-        "--top-module", top_module_isim
+    # DSim komutu (Tek adimda derleme ve kosturma)
+    dsim_cmd = [
+        "dsim",
+        "-top", top_module_isim,
+        "-l", "dsim_run.log" # Loglari sim/ altinda tut
     ]
     
-    verilator_cmd.extend(rtl_files)
-    verilator_cmd.append(tb_cpp)
+    dsim_cmd.extend(rtl_files)
+    dsim_cmd.append(tb_sv)
     
-    try:
-        subprocess.run(verilator_cmd, cwd=project_root, check=True)
-        print("-> Derleme Başarılı.\n")
-    except subprocess.CalledProcessError:
-        print(f"\n{RED}Derleme Hatası! RTL veya Testbench kodlarinizi kontrol edin.{RESET}")
-        sys.exit(1)
-    except FileNotFoundError:
-        print(f"\n{RED}Hata: 'verilator' komutu bulunamadi. Sisteme kurulu oldugundan emin olun.{RESET}")
-        sys.exit(1)
-
-    # ==========================================
-    # 2. ADIM: Simülasyonu Çalıştırma (Execute)
-    # ==========================================
-    print(f"[2/2] Simülasyon {top_module_isim} modülü için yürütülüyor...\n")
-    print("-" * 50)
-    
-    # Uretilen executable yolu
-    exe_path = os.path.join(sim_dir, "obj_dir", f"V{top_module_isim}")
-    if os.name == 'nt' and os.path.exists(exe_path + ".exe"):
-        exe_path += ".exe"
-        
-    if not os.path.exists(exe_path):
-        print(f"{RED}Hata: Calistirilabilir dosya bulunamadi: {exe_path}{RESET}")
-        sys.exit(1)
-
     has_error = False
     
-    # Executable'i calistir ve stdout'u anlik oku
-    process = subprocess.Popen(
-        [exe_path], 
-        stdout=subprocess.PIPE, 
-        stderr=subprocess.STDOUT,
-        text=True,
-        cwd=sim_dir
-    )
-    
-    for line in process.stdout:
-        print(line, end="") # Simulasyon loglarini konsola oldugu gibi bas
+    try:
+        # Executable'i calistir ve stdout'u anlik oku
+        process = subprocess.Popen(
+            dsim_cmd, 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.STDOUT,
+            text=True,
+            cwd=sim_dir
+        )
         
-        # Test durumunu yakalamak icin keyword arama
-        upper_line = line.upper()
-        if "UVM_ERROR" in upper_line or "UVM_FATAL" in upper_line or "FAIL" in upper_line:
-            has_error = True
+        for line in process.stdout:
+            print(line, end="") # Loglari konsola bas
+            
+            # Hata kontrolu
+            upper_line = line.upper()
+            if "UVM_ERROR" in upper_line or "UVM_FATAL" in upper_line or "FAIL" in upper_line or "ERROR:" in upper_line:
+                has_error = True
 
-    process.wait()
+        process.wait()
+        
+        if process.returncode != 0:
+            has_error = True
+            
+    except FileNotFoundError:
+        print(f"\n{RED}Hata: 'dsim' komutu bulunamadi. Metrics DSim aracinin yuklu ve PATH'te oldugundan emin olun.{RESET}")
+        sys.exit(1)
+
     print("-" * 50)
     
-    # ==========================================
-    # 3. ADIM: Sonuclari Degerlendirme
-    # ==========================================
+    # Sonuclari Degerlendirme
     if has_error:
         print(f"\n{RED}>>> TEST FAILED <<<{RESET}\n")
     else:

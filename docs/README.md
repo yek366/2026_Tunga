@@ -29,8 +29,7 @@ Jüri üyelerinin, doğrulama ortamını kendi sunucularında tek tıkla test ed
 
 ### Bağımlılıklar (Requirements)
 Sisteme herhangi bir harici Python paketi kurmanıza gerek yoktur (Python 3.x standart kütüphanelerini kullanır). Ancak simülatör olarak aşağıdaki aracın sistemde (PATH ortam değişkeninde) yüklü olması şarttır:
-- **Verilator** (Açık kaynak SystemVerilog simülatörü)
-- **C++ Derleyici** (GCC veya Clang, Verilator arkada kullanır)
+- **Metrics DSim** (UVM ve SV destekli yüksek performanslı simülatör)
 
 ### Testleri Çalıştırma
 
@@ -42,6 +41,6 @@ python scripts/run_sim.py
 ```
 
 Bu script çalıştığında:
-1. `rtl/` altındaki kodlar ile testbench'i bağlayıp `Verilator` kullanarak derleyecek.
-2. Simülasyonu başlatıp, standart çıktıları eş zamanlı olarak konsola basacak.
+1. `rtl/` altındaki kodlar ile testbench'i bağlayıp `DSim` kullanarak tek adımda derleyecek ve koşturacaktır.
+2. Simülasyon loglarını `sim/` dizinine kaydedecek ve standart çıktıları eş zamanlı olarak konsola basacak.
 3. Logların içindeki `UVM_ERROR`, `UVM_FATAL` ve `FAIL` yapılarını analiz edip en sonda jüri için terminale yeşil **TEST PASSED** veya kırmızı **TEST FAILED** yazdıracaktır.
