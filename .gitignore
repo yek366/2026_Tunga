@@ -1,0 +1,26 @@
+# Simulation Tools (Metrics DSim, Verilator)
+obj_dir/
+*.o
+*.so
+dsim.log
+dsim.env
+dsim.work/
+metrics.db/
+*.vcd
+*.fsdb
+*.fst
+
+# Python Environment
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+ENV/
+env/
+
+# UVM Logs & Build Outputs
+*.log
+*.jou
+*.pb
+sim/
+!sim/.gitkeep
