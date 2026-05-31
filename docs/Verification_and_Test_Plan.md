@@ -4,7 +4,7 @@
 
 Bu belge, Teknofest 2026 Çip Tasarım Yarışması Mikrodenetleyici Kategorisi kapsamında geliştirilen CV32E40P RISC-V çekirdekli SoC (Tunga) donanımının doğrulama stratejisini detaylandırmaktadır. 
 
-Ana hedefimiz, tasarlanan SoC'nin şartnameye, endüstri standartlarına (UVM ve AXI) ve beklenen mimari performans kriterlerine birebir uyduğundan emin olmaktır. Doğrulama süreci boyunca Metrics DSim platformu kullanılarak yüksek performanslı bir ko-simülasyon ve otomasyon çevresi hedeflenmektedir.
+Ana hedefimiz, tasarlanan SoC'nin şartnameye, endüstri standartlarına (UVM ve AXI) ve beklenen mimari performans kriterlerine birebir uyduğundan emin olmaktır. Doğrulama süreci boyunca Xilinx Vivado (XSIM) platformu kullanılarak yüksek performanslı bir ko-simülasyon ve otomasyon çevresi hedeflenmektedir.
 
 ### Başarı Kriterleri
 - **Boot Akışının Doğrulanması:** Sistemin sıfırlama (reset) anından itibaren QSPI flash üzerinden başarıyla C/Assembly komutlarını çekip çalıştırmaya (boot) başlayabildiğinin uçtan uca kanıtlanması.
@@ -39,8 +39,8 @@ Hızlandırıcının, TensorFlow Lite Micro Speech mimarisiyle uygun donanımsal
 ## 3. Metodoloji ve Araçlar
 
 Doğrulama ve otomasyon metodolojimiz tamamen endüstri standartları çevresinde şekillendirilmiştir:
-- **Simülasyon Aracı:** Hızlı derleme ve ko-simülasyon yetenekleri, DPI-C adaptasyonu ve UVM desteği sayesinde **Metrics DSim** simülatörü ana motorumuzdur. Tüm RTL ve Testbench derleme işlemleri DSim üzerinden yürütülmektedir.
-- **UVM ve AXI VIP:** Sistemdeki AXI veriyolu haberleşmesini ve protokol kurallarını (protocol checks) teyit etmek için açık kaynaklı UVM tabanlı ajanlar (Agents) yapılandırılmıştır.
+- **Simülasyon Aracı:** Hızlı derleme ve ko-simülasyon yetenekleri, DPI-C adaptasyonu ve donanım destekli simülasyon uyumluluğu sebebiyle **Xilinx Vivado (XSIM)** simülatörü ana motorumuzdur. UVM mimarisi doğrudan Xilinx UVM Kütüphanesi kullanılarak yürütülmektedir.
+- **UVM ve AXI VIP:** Sistemdeki AXI veriyolu haberleşmesini ve protokol kurallarını (protocol checks) teyit etmek için açık kaynaklı UVM tabanlı ajanlar (Agents) ve kendi-kendini test eden (Self-Checking) Mock BFM'ler yapılandırılmıştır.
 - **Otomasyon:** Testlerin başlatılması, derleme hatalarının ayrıştırılması ve loglarda "FAIL/UVM_ERROR" aranması gibi tüm CI/CD süreçleri özel Python otomasyon betikleri (`scripts/run_sim.py`) üzerinden tek tıkla yürütülmektedir.
 - **Ko-Simülasyon (Co-Sim):** Online çevrimiçi kıyaslama için C++ / DPI-C arabirimleriyle Spike (RISC-V ISS) çekirdeğe gömülmüştür.
 
@@ -49,8 +49,8 @@ Doğrulama ve otomasyon metodolojimiz tamamen endüstri standartları çevresind
 ## 4. Kapsam (Coverage) ve İlerleme Takibi
 
 Yarışma ve standartların bir gereği olarak kod ve fonksiyonel kapsam metrikleri, simülasyonlarımızdan toplanmaktadır:
-- **Code Coverage:** Metrics DSim kullanılarak RTL üzerindeki Statement, Branch, FSM ve Toggle Coverage verileri otomatik analiz edilir; ölü kodlar tespit edilir.
-- **Functional Coverage:** UVM Subscriber'lar içerisinde yazılmış olan Covergroup'lar kullanılarak çevrebirimi konfigürasyonlarının (UART baud rate vs.) ve AXI sınır değerlerinin (corner cases) test edilip edilmediği ölçülür.
+- **Code Coverage:** Vivado XSIM kullanılarak RTL üzerindeki Statement, Branch, FSM ve Toggle Coverage verileri analiz edilecek ve ölü kodlar (dead-code) tespit edilecektir.
+- **Functional Coverage:** `coverage_collector.sv` içerisindeki UVM Subscriber'lar ile donanım (UART baud rate vs.) ve AXI sınır değerlerinin (corner cases) durumları ölçülmekte, test bitiminde `report_phase` üzerinden "Fonksiyonel Kapsama Raporu" otomatik olarak loglanmaktadır.
 
 ### Test İlerleme Tablosu
 
@@ -59,8 +59,8 @@ Yarışma ve standartların bir gereği olarak kod ve fonksiyonel kapsam metrikl
 | `TC_CORE_01` | Rastgele Komut Stresi (Spike Co-Sim) | Çekirdek | Bekliyor | - |
 | `TC_CORE_02` | Yönlendirilmiş Kesme (Interrupt) Trap | Çekirdek | Devam Ediyor | %50 |
 | `TC_PER_01`  | AXI Rastgele Burst Yazma/Okuma | Çevre Birimleri | Bekliyor | - |
-| `TC_PER_02`  | UART/I2C/Timer Protokol ve İşlev | Çevre Birimleri | Bekliyor | - |
-| `TC_AI_01`   | TFLite Micro Speech Referans Kıyaslama | YZ Hızlandırıcı | Bekliyor | - |
+| `TC_PER_02`  | UART/I2C/Timer Protokol ve İşlev | Çevre Birimleri | Tamamlandı (Mock) | %100 |
+| `TC_AI_01`   | TFLite Micro Speech Referans Kıyaslama | YZ Hızlandırıcı | Tamamlandı (Mock) | %100 |
 | `TC_AI_02`   | AI Hızlandırıcı Backpressure ve Kesme | YZ Hızlandırıcı | Bekliyor | - |
 | `TC_SYS_01`  | QSPI Master Uçtan Uca Boot Akışı | Sistem / QSPI | Tamamlandı | %100 |
 | `TC_SYS_02`  | Rastgele Donanımsal/Yazılımsal Sıfırlama | Sistem | Bekliyor | - |
