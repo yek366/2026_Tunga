@@ -1,8 +1,13 @@
 `timescale 1ns / 1ps
 
-// UVM Macros (Eğer UVM framework kullanılacaksa)
-// `include "uvm_macros.svh"
-// import uvm_pkg::*;
+// 1. UVM Macros ve Importları aktif edildi
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+
+// Yeni oluşturulan UVM dosyaları dahil ediliyor
+`include "tunga_soc_if.sv"
+`include "tunga_env.sv"
+`include "base_test.sv"
 
 module tb_tunga_soc_modified();
 
@@ -11,6 +16,9 @@ module tb_tunga_soc_modified();
     logic rst_ni;
     logic uart0_tx_o;
     logic uart0_rx_i;
+
+    // 2. Sanal Arayüz (Virtual Interface) Tanımlaması
+    tunga_soc_if vif(.clk(clk_i), .rst_n(rst_ni));
 
     // AXI VIP için örnek arayüz (Interface) tanımlamaları
     // wire [31:0] axi_awaddr, axi_wdata, axi_araddr, axi_rdata;
@@ -75,5 +83,14 @@ module tb_tunga_soc_modified();
         end
     end
     */
+
+    // 3. UVM Testinin Başlatılması
+    initial begin
+        // Sanal arayüzü UVM veritabanına kaydet (Tüm agent bileşenleri buradan çekecek)
+        uvm_config_db#(virtual tunga_soc_if)::set(null, "uvm_test_top.env.*", "vif", vif);
+
+        // UVM Fazlarını ve Testi Başlat (Build_phase -> Run_phase -> ...)
+        run_test("base_test");
+    end
 
 endmodule

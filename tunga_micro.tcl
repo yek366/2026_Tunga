@@ -1983,3 +1983,15 @@ move_dashboard_gadget -name {drc_1} -row 2 -col 0
 move_dashboard_gadget -name {timing_1} -row 0 -col 1
 move_dashboard_gadget -name {utilization_2} -row 1 -col 1
 move_dashboard_gadget -name {methodology_1} -row 2 -col 1
+
+# --- SAFE DPI-C AND PROPERTY ASSIGNMENT ---
+# 1. Güvenli Özellik Ataması (Safe Property Assignment) & 2. DPI-C Dosya Tipi Tanımlaması
+foreach f [get_files -quiet] {
+    set ext [file extension $f]
+    if {$ext == ".c" || $ext == ".cc" || $ext == ".cpp"} {
+        puts "Setting file_type for DPI-C source: $f"
+        catch { set_property file_type {C Source} $f }
+        catch { set_property used_in_synthesis false $f }
+    }
+}
+# ------------------------------------------

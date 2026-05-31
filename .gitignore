@@ -24,3 +24,5 @@ env/
 *.pb
 sim/
 !sim/.gitkeep
+
+tunga_micro*/

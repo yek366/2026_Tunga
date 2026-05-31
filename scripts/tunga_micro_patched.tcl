@@ -358,28 +358,19 @@ set files [list \
  [file normalize "${origin_dir}/../rtl/tunga_soc_top.sv"] \
 ]
   # Eksik core dosyalarını src altından topluca ekle (Otomasyon Patch)
-  if {[llength [glob -nocomplain ${origin_dir}/../rtl/core/src/*]] > 0} {
-    add_files -norecurse -fileset $obj [glob -nocomplain ${origin_dir}/../rtl/core/src/*]
   }
   # Eksik core dosyalarını src altından topluca ekle (Otomasyon Patch)
-  if {[llength [glob -nocomplain ${origin_dir}/../rtl/core/src/*]] > 0} {
-    add_files -norecurse -fileset $obj [glob -nocomplain ${origin_dir}/../rtl/core/src/*]
   }
   # Eksik core dosyalarını src altından topluca ekle (Otomasyon Patch)
-  if {[llength [glob -nocomplain ${origin_dir}/../rtl/core/src/*]] > 0} {
-    add_files -norecurse -fileset $obj [glob -nocomplain ${origin_dir}/../rtl/core/src/*]
   }
   # Eksik core dosyalarını src altından topluca ekle (Otomasyon Patch)
-  if {[llength [glob -nocomplain ${origin_dir}/../rtl/core/src/*]] > 0} {
-    add_files -norecurse -fileset $obj [glob -nocomplain ${origin_dir}/../rtl/core/src/*]
   }
   # Eksik core dosyalarını src altından topluca ekle (Otomasyon Patch)
-  if {[llength [glob -nocomplain ${origin_dir}/../rtl/core/src/*]] > 0} {
-    add_files -norecurse -fileset $obj [glob -nocomplain ${origin_dir}/../rtl/core/src/*]
   }
   # Eksik core dosyalarını src altından topluca ekle (Otomasyon Patch)
-  if {[llength [glob -nocomplain ${origin_dir}/../rtl/core/src/*]] > 0} {
-    add_files -norecurse -fileset $obj [glob -nocomplain ${origin_dir}/../rtl/core/src/*]
+  }
+  if {[llength [glob -nocomplain "C:/Users/VICTUS/.gemini/antigravity/scratch/2026_Tunga/rtl/core/src/*"]] > 0} {
+    add_files -norecurse -fileset $obj [glob -nocomplain "C:/Users/VICTUS/.gemini/antigravity/scratch/2026_Tunga/rtl/core/src/*"]
   }
 add_files -norecurse -fileset $obj $files
 
@@ -390,702 +381,1050 @@ set files [list \
 set added_files [add_files -fileset sources_1 $files]
 
 # Set 'sources_1' fileset file properties for remote files
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "Verilog Header" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "Verilog Header" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "Verilog Header" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "Verilog Header" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "Verilog Header" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "Verilog Header" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "Verilog Header" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
-
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "Verilog Header" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "Verilog Header" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "Verilog Header" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "Verilog Header" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "Verilog Header" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "Verilog Header" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "Verilog Header" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
+
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
 set file "$origin_dir/../rtl/tunga_soc_top.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
 
 # Set 'sources_1' fileset file properties for local files
@@ -1122,31 +1461,28 @@ if {[string equal [get_filesets -quiet sim_1] ""]} {
 # Set 'sim_1' fileset object
 set obj [get_filesets sim_1]
 set files [list \
- [file normalize "${origin_dir}/tb_tunga_soc.sv"] \
+ [file normalize "${origin_dir}/../tb/tb_tunga_soc.sv"] \
 ]
   # Eksik core dosyalarını src altından topluca ekle (Otomasyon Patch)
-  if {[llength [glob -nocomplain ${origin_dir}/../rtl/core/src/*]] > 0} {
-    add_files -norecurse -fileset $obj [glob -nocomplain ${origin_dir}/../rtl/core/src/*]
   }
   # Eksik core dosyalarını src altından topluca ekle (Otomasyon Patch)
-  if {[llength [glob -nocomplain ${origin_dir}/../rtl/core/src/*]] > 0} {
-    add_files -norecurse -fileset $obj [glob -nocomplain ${origin_dir}/../rtl/core/src/*]
   }
   # Eksik core dosyalarını src altından topluca ekle (Otomasyon Patch)
-  if {[llength [glob -nocomplain ${origin_dir}/../rtl/core/src/*]] > 0} {
-    add_files -norecurse -fileset $obj [glob -nocomplain ${origin_dir}/../rtl/core/src/*]
   }
   # Eksik core dosyalarını src altından topluca ekle (Otomasyon Patch)
-  if {[llength [glob -nocomplain ${origin_dir}/../rtl/core/src/*]] > 0} {
-    add_files -norecurse -fileset $obj [glob -nocomplain ${origin_dir}/../rtl/core/src/*]
+  }
+  if {[llength [glob -nocomplain "C:/Users/VICTUS/.gemini/antigravity/scratch/2026_Tunga/rtl/core/src/*"]] > 0} {
+    add_files -norecurse -fileset $obj [glob -nocomplain "C:/Users/VICTUS/.gemini/antigravity/scratch/2026_Tunga/rtl/core/src/*"]
   }
 add_files -norecurse -fileset $obj $files
 
 # Set 'sim_1' fileset file properties for remote files
 set file "$origin_dir/tb_tunga_soc.sv"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sim_1] [list "*$file"]]
-set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+catch {
+    set file [file normalize $file]
+    set file_obj [get_files -quiet -of_objects [get_filesets sources_1] [list "*$file"]]
+    set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
+}
 
 
 # Set 'sim_1' fileset file properties for local files
@@ -1480,15 +1816,3 @@ move_dashboard_gadget -name {drc_1} -row 2 -col 0
 move_dashboard_gadget -name {timing_1} -row 0 -col 1
 move_dashboard_gadget -name {utilization_2} -row 1 -col 1
 move_dashboard_gadget -name {methodology_1} -row 2 -col 1
-
-# --- SAFE DPI-C AND PROPERTY ASSIGNMENT ---
-# 1. Güvenli Özellik Ataması (Safe Property Assignment) & 2. DPI-C Dosya Tipi Tanımlaması
-foreach f [get_files -quiet] {
-    set ext [file extension $f]
-    if {$ext == ".c" || $ext == ".cc" || $ext == ".cpp"} {
-        puts "Setting file_type for DPI-C source: $f"
-        catch { set_property file_type {C Source} $f }
-        catch { set_property used_in_synthesis false $f }
-    }
-}
-# ------------------------------------------

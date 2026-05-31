@@ -44,8 +44,12 @@ module tb_system_integration();
         .clk_i      (clk_i),
         .rst_ni     (rst_ni),
         .uart0_tx_o (uart0_tx_o),
-        .uart0_rx_i (uart0_rx_i),
+        .uart0_rx_i (uart0_rx_i)
         
+        /* 
+        Henüz RTL takımının ana modülünde (tunga_soc_top) QSPI pinleri 
+        bulunmadığı için şimdilik bağlantıları yoruma alıyoruz.
+        RTL koduna eklendiğinde buradaki yorumlar açılmalıdır.
         // QSPI Portları
         .qspi_cs_n  (qspi_cs_n),
         .qspi_sclk  (qspi_sclk),
@@ -53,6 +57,7 @@ module tb_system_integration();
         .qspi_io1   (qspi_io1),
         .qspi_io2   (qspi_io2),
         .qspi_io3   (qspi_io3)
+        */
     );
 
     // Resmi Micron QSPI Flash Bellek Modeli Bağlantısı (MT25QL256ABA)
