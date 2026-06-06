@@ -1,0 +1,54 @@
+# Simülasyon çıktıları
+sim/
+obj_dir/
+*.vcd
+*.fst
+*.log
+
+# Vivado çıktıları
+vivado/*.jou
+vivado/*.log
+vivado/*.str
+vivado/runs/
+vivado/.Xil/
+
+# OpenLane çıktıları
+openlane/runs/
+
+# Teknotest gate — build/sim artifactları (build.py + Vivado yeniden üretir; commit edilmez)
+teknotest/vivado_proj/
+teknotest/sw/build/
+teknotest/.Xil/
+teknotest/*.jou
+run_teknotest_sim.tcl
+teknotest_sim*.log
+dfx_runtime.txt
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Derleme çıktıları
+*.o
+*.a
+*.elf
+*.hex
+*.bin
+
+# Editor
+.vscode/
+*.swp
+*~
+.DS_Store
+
+# Harici kaynak kopyaları
+clones/
+
+# Proje içi çalışma notları (repo dışı)
+dokumanlar/
+NASIL_KULLANILIR.md
+
+# Weights (büyük binary dosyalar; gerekiyorsa LFS)
+weights/*.bin

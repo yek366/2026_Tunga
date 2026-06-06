@@ -1,0 +1,43 @@
+=======================================================
+        TEKNOFEST 2026 - SoC ADRES HARİTASI            
+=======================================================
+Segment: /axi_bram_ctrl_0/S_AXI/Mem0 | Base Address:  | Range: 0x00001000
+Segment: /axi_gpio_0/S_AXI/Reg | Base Address:  | Range: 0x00001000
+Segment: /axi_iic_0/S_AXI/Reg | Base Address:  | Range: 0x00001000
+Segment: /axi_intc_0/S_AXI/Reg | Base Address:  | Range: 0x00001000
+Segment: /axi_qspi_T_v1_0_0/s00_axi/reg0 | Base Address:  | Range: 0x00001000
+Segment: /axi_qspi_T_v1_0_0/s_axi_intr/reg0 | Base Address:  | Range: 0x00001000
+Segment: /axi_timer_0/S_AXI/Reg | Base Address:  | Range: 0x00000200
+Segment: /boot_rom_0/s_axi/reg0 | Base Address:  | Range: 0x000100000000
+Segment: /jtag_axi_0/Data/SEG_axi_bram_ctrl_0_Mem0 | Base Address: 0xC0000000 | Range: 0x00002000
+Segment: /jtag_axi_0/Data/SEG_axi_gpio_0_Reg | Base Address: 0x40000000 | Range: 0x00010000
+Segment: /jtag_axi_0/Data/SEG_axi_iic_0_Reg | Base Address: 0x40800000 | Range: 0x00010000
+Segment: /jtag_axi_0/Data/SEG_axi_intc_0_Reg | Base Address: 0x41200000 | Range: 0x00010000
+Segment: /jtag_axi_0/Data/SEG_axi_qspi_T_v1_0_0_reg0 | Base Address: 0x44A00000 | Range: 0x00001000
+Segment: /jtag_axi_0/Data/SEG_axi_qspi_T_v1_0_0_reg0_1 | Base Address: 0x44A01000 | Range: 0x00001000
+Segment: /jtag_axi_0/Data/SEG_axi_timer_0_Reg | Base Address: 0x41C00000 | Range: 0x00010000
+Segment: /jtag_axi_0/Data/SEG_boot_rom_0_reg0 | Base Address: 0x00000000 | Range: 0x40000000
+Segment: /jtag_axi_0/Data/SEG_uart_peripheral_0_reg0 | Base Address: 0x40011000 | Range: 0x00001000
+Segment: /jtag_axi_0/Data/SEG_uart_stream_peripher_0_reg0 | Base Address: 0x40010000 | Range: 0x00001000
+Segment: /obi_to_axi_bridge_0/m_axi/SEG_axi_bram_ctrl_0_Mem0 | Base Address: 0xC0000000 | Range: 0x00002000
+Segment: /obi_to_axi_bridge_0/m_axi/SEG_axi_gpio_0_Reg | Base Address: 0x40000000 | Range: 0x00010000
+Segment: /obi_to_axi_bridge_0/m_axi/SEG_axi_iic_0_Reg | Base Address: 0x40800000 | Range: 0x00010000
+Segment: /obi_to_axi_bridge_0/m_axi/SEG_axi_intc_0_Reg | Base Address: 0x41200000 | Range: 0x00010000
+Segment: /obi_to_axi_bridge_0/m_axi/SEG_axi_qspi_T_v1_0_0_reg0 | Base Address: 0x44A00000 | Range: 0x00001000
+Segment: /obi_to_axi_bridge_0/m_axi/SEG_axi_qspi_T_v1_0_0_reg0_1 | Base Address: 0x44A10000 | Range: 0x00001000
+Segment: /obi_to_axi_bridge_0/m_axi/SEG_axi_timer_0_Reg | Base Address: 0x41C00000 | Range: 0x00010000
+Segment: /obi_to_axi_bridge_0/m_axi/SEG_boot_rom_0_reg0 | Base Address: 0x00000000 | Range: 0x40000000
+Segment: /obi_to_axi_bridge_0/m_axi/SEG_uart_peripheral_0_reg0 | Base Address: 0x40011000 | Range: 0x00001000
+Segment: /obi_to_axi_bridge_0/m_axi/SEG_uart_stream_peripher_0_reg0 | Base Address: 0x40010000 | Range: 0x00001000
+Segment: /uart_peripheral_0/s_axil/reg0 | Base Address:  | Range: 0x00001000
+Segment: /uart_stream_peripher_0/m_axil/SEG_axi_bram_ctrl_0_Mem0 | Base Address: 0xC0000000 | Range: 0x00002000
+Segment: /uart_stream_peripher_0/m_axil/SEG_axi_gpio_0_Reg | Base Address: 0x40000000 | Range: 0x00010000
+Segment: /uart_stream_peripher_0/m_axil/SEG_axi_iic_0_Reg | Base Address: 0x40800000 | Range: 0x00010000
+Segment: /uart_stream_peripher_0/m_axil/SEG_axi_intc_0_Reg | Base Address: 0x41200000 | Range: 0x00010000
+Segment: /uart_stream_peripher_0/m_axil/SEG_axi_qspi_T_v1_0_0_reg0 | Base Address: 0x44A00000 | Range: 0x00002000
+Segment: /uart_stream_peripher_0/m_axil/SEG_axi_qspi_T_v1_0_0_reg0_1 | Base Address: 0x44A02000 | Range: 0x00002000
+Segment: /uart_stream_peripher_0/m_axil/SEG_axi_timer_0_Reg | Base Address: 0x41C00000 | Range: 0x00010000
+Segment: /uart_stream_peripher_0/m_axil/SEG_boot_rom_0_reg0 | Base Address: 0x80000000 | Range: 0x40000000
+Segment: /uart_stream_peripher_0/m_axil/SEG_uart_peripheral_0_reg0 | Base Address: 0x40011000 | Range: 0x00001000
+Segment: /uart_stream_peripher_0/m_axil/SEG_uart_stream_peripher_0_reg0 | Base Address: 0x40010000 | Range: 0x00001000
+Segment: /uart_stream_peripher_0/s_axil/reg0 | Base Address:  | Range: 0x00001000
