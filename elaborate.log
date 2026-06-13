@@ -1,0 +1,46 @@
+Vivado Simulator v2025.2
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: C:/AMDDesignTools/2025.2/Vivado/bin/unwrapped/win64.o/xelab.exe --incr --debug typical --relax --mt 2 -L xil_defaultlib -L uvm -L unisims_ver -L unimacro_ver -L secureip --snapshot tb_tunga_soc_behav xil_defaultlib.tb_tunga_soc xil_defaultlib.glbl -log elaborate.log 
+Using 2 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-5021] port 'apu_gnt_i' is not connected on this instance [C:/Users/Acer/tunga_mcu/tunga_mcu/tunga_micro/tunga_micro.srcs/sources_1/imports/Downloads/soc_top.sv:57]
+Completed static elaboration
+Starting simulation data flow analysis
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package xil_defaultlib.memory_map_pck
+Compiling package xil_defaultlib.cv32e40p_apu_core_pkg
+Compiling package xil_defaultlib.cv32e40p_pkg
+Compiling package xil_defaultlib.cv32e40p_fpu_pkg
+Compiling module xil_defaultlib.cv32e40p_clock_gate
+Compiling module xil_defaultlib.cv32e40p_sleep_unit_default
+Compiling module xil_defaultlib.cv32e40p_prefetch_controller(COR...
+Compiling module xil_defaultlib.cv32e40p_fifo(DEPTH=32'b010)
+Compiling module xil_defaultlib.cv32e40p_obi_interface_default
+Compiling module xil_defaultlib.cv32e40p_prefetch_buffer(COREV_P...
+Compiling module xil_defaultlib.cv32e40p_aligner
+Compiling module xil_defaultlib.cv32e40p_compressed_decoder
+Compiling module xil_defaultlib.cv32e40p_if_stage
+Compiling module xil_defaultlib.cv32e40p_register_file(ADDR_WIDT...
+Compiling module xil_defaultlib.cv32e40p_decoder(COREV_PULP=0)
+Compiling module xil_defaultlib.cv32e40p_controller_default
+Compiling module xil_defaultlib.cv32e40p_int_controller_default
+Compiling module xil_defaultlib.cv32e40p_id_stage(COREV_PULP=0)
+Compiling module xil_defaultlib.cv32e40p_popcnt
+Compiling module xil_defaultlib.cv32e40p_ff_one_default
+Compiling module xil_defaultlib.cv32e40p_alu_div_default
+Compiling module xil_defaultlib.cv32e40p_alu
+Compiling module xil_defaultlib.cv32e40p_mult
+Compiling module xil_defaultlib.cv32e40p_ex_stage_default
+Compiling module xil_defaultlib.cv32e40p_obi_interface(TRANS_STA...
+Compiling module xil_defaultlib.cv32e40p_load_store_unit_default
+Compiling module xil_defaultlib.cv32e40p_cs_registers_default
+Compiling module xil_defaultlib.cv32e40p_core_default
+Compiling module xil_defaultlib.obi_to_axi_simple
+Compiling module xil_defaultlib.axi_lite_interconnect
+Compiling module xil_defaultlib.soc_top
+Compiling module xil_defaultlib.tb_tunga_soc
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot tb_tunga_soc_behav
