@@ -24,6 +24,21 @@ run_teknotest_sim.tcl
 teknotest_sim*.log
 dfx_runtime.txt
 
+# Vivado/XSim run artifactları (root'a kaçanlar dahil — commit edilmez)
+*.xpr
+*.wdb
+*.pb
+*.jou
+*.str
+glbl.v
+xsim.ini
+compile.bat
+elaborate.bat
+simulate.bat
+*_vlog.prj
+xsim.dir/
+.Xil/
+
 # Python
 __pycache__/
 *.pyc
