@@ -1,6 +1,5 @@
-// Load the compiled test program into the boot ROM array.
-// helloworld.mem filename is fixed by DDK (added by create_vivado_proj.tcl).
-// Hierarchy: tb(dut) -> teknotest_wrapper(u_soc) -> tunga_soc_min(u_bootrom) -> rom
+// helloworld.mem'i boot ROM dizisine yükle (dosya adı DDK sabiti).
+// Hiyerarşi: tb(dut) -> teknotest_wrapper(u_tunga_soc) -> soc_top(u_boot_rom) -> mem
 initial begin
-    $readmemh("helloworld.mem", dut.u_soc.u_bootrom.rom);
+    $readmemh("helloworld.mem", dut.u_tunga_soc.u_boot_rom.mem);
 end

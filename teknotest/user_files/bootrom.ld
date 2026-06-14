@@ -4,7 +4,7 @@ ENTRY(_start)
 MEMORY
 {
   BOOTROM (rx)  : ORIGIN = 0x00000000, LENGTH = 1K
-  RAM     (rwx) : ORIGIN = 0x80000000, LENGTH = 8K
+  RAM     (rwx) : ORIGIN = 0x20000000, LENGTH = 8K
 }
 
 SECTIONS

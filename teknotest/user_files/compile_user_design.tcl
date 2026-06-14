@@ -1,15 +1,10 @@
 # =============================================================
-# TUNGA SoC — teknotest design file list
-# All paths are RELATIVE to the teknotest/ directory (absolute paths
-# fail during DDK evaluation). Design RTL lives in ../rtl (sibling of
-# teknotest/). Run from within teknotest/ via create_vivado_proj.tcl.
+# TUNGA SoC — teknotest design file list (Yuşa soc_top entegrasyonu)
+# Tüm yollar teknotest/ dizinine GÖRE relative (absolute = jüri fail).
+# Tasarım RTL'i ../rtl altında. create_vivado_proj.tcl içinden çağrılır.
 # =============================================================
 
-# ---- CV32E40P core (OpenHW) ----
-# Explicit manifest list (cv32e40p_manifest.flist). FPU=0, so
-# cv32e40p_fp_wrapper.sv is intentionally EXCLUDED — it imports fpnew_pkg
-# (CVFPU), which is not vendored. A glob of rtl/*.sv would pull it and
-# break compilation. Packages first, then RTL, then top, then sim clock gate.
+# ---- CV32E40P core (OpenHW) — explicit manifest, fp_wrapper HARİÇ (FPU=0) ----
 set core ../rtl/core/cv32e40p/rtl
 add_files $core/include/cv32e40p_apu_core_pkg.sv
 add_files $core/include/cv32e40p_fpu_pkg.sv
@@ -38,29 +33,23 @@ add_files $core/cv32e40p_obi_interface.sv
 add_files $core/cv32e40p_prefetch_controller.sv
 add_files $core/cv32e40p_sleep_unit.sv
 add_files $core/cv32e40p_core.sv
-add_files $core/cv32e40p_top.sv
 add_files ../rtl/core/cv32e40p/bhv/cv32e40p_sim_clock_gate.sv
 
-# ---- TUNGA gate RTL ----
-add_files ../rtl/memory/obi_bootrom.sv
-add_files ../rtl/memory/obi_sram.sv
-add_files ../rtl/bus/obi2axil.sv
-
-# ---- UART0 peripheral ----
+# ---- UART0 (stream) periferik yığını ----
 add_files ../rtl/peripherals/uart_pkg.sv
-add_files ../rtl/peripherals/uart_rx.sv
 add_files ../rtl/peripherals/uart_tx.sv
-add_files ../rtl/peripherals/uart_peripheral.sv
+add_files ../rtl/peripherals/uart_rx.sv
+add_files ../rtl/peripherals/sync_fifo.sv
+add_files ../rtl/peripherals/uart_stream_peripheral.sv
 
-# ---- SoC top + wrapper ----
-add_files ../rtl/top/tunga_soc_min.sv
+# ---- Bellekler + SoC top ----
+add_files ../rtl/boot/boot_rom.sv
+add_files ../rtl/memory/tunga_sram.sv
+add_files ../rtl/top/soc_top.sv
+
+# ---- Wrapper (user_files) ----
 add_files ./user_files/teknotest_wrapper.sv
 
-# Note: CV32E40P RTL has no `include directives (packages are added as design
-# files and compiled in dependency order), so no +incdir is required here.
-# create_vivado_proj.tcl re-sets include_dirs to ./user_files afterwards, so any
-# include_dirs set here would be overwritten anyway.
-
-# ---- Defines: simulation + behavioral clock-gate model ----
+# ---- Defines: simülasyon + behavioral clock-gate modeli ----
 set_property verilog_define {SIMULATION USE_CG_BEHAV_MODELS} \
     [list [get_filesets sources_1] [get_filesets sim_1]]

@@ -1,2 +1,2 @@
-// UART0 base address in the TUNGA gate memory map (see tunga_soc_min.sv)
-#define UART_BASE_ADDR 0x10000000
+// UART0 base address (Yuşa soc_top memory map: UART0 @ 0x4002_0000)
+#define UART_BASE_ADDR 0x40020000

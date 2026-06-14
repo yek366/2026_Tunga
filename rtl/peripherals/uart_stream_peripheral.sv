@@ -1,23 +1,26 @@
 // =============================================================================
 // uart_stream_peripheral.sv
-// TEKNOFEST 2026 Çip Tasarım Yarışması - UART Stream Çevre Birimi
+// TEKNOFEST 2026 Çip Tasarım Yarışması - UART Stream Çevre Birimi (Gömülü DMA Sürümü)
+//
+// Çift Arayüz: 
+//   - AXI4-Lite Slave  : CPU konfigürasyonu ve yazmaç erişimi
+//   - AXI4-Lite Master : Gelen verileri doğrudan YZ Belleğine (SRAM) yazma
 // =============================================================================
 
-// Vivado IP Packager'ın XML motorunu ezmemek için port genişlik parametreleri 
-// doğrudan modül parametre listesine (default tamsayı değerleriyle) taşınmıştır.
 module uart_stream_peripheral #(
     parameter int SYS_CLK_HZ    = 50_000_000,
     parameter int DEFAULT_BAUD  = 115_200,
-    parameter int AXI_ADDR_W    = 8,   // IP Packager'ın XPath motoru için açıkça eklendi
-    parameter int AXI_DATA_W    = 32,  // IP Packager'ın XPath motoru için açıkça eklendi
-    parameter int FIFO_DEPTH    = 256, // STREAM_FIFO_DEPTH doğrudan long/integer olarak yazıldı
-    parameter int FIFO_PTR_W    = 8    // clog2(256) değeri doğrudan statik tamsayı verildi
+    parameter int AXI_ADDR_W    = 8,   // Slave Adres Genişliği
+    parameter int AXI_DATA_W    = 32,  // Slave/Master Veri Genişliği
+    parameter int M_AXI_ADDR_W  = 32,  // Master Adres Genişliği (SRAM/YZ erişimi için)
+    parameter int FIFO_DEPTH    = 256,
+    parameter int FIFO_PTR_W    = 8
 )(
     input  logic        clk,
     input  logic        rst_n,
 
     // -------------------------------------------------------------------
-    // AXI4-Lite Slave Arayüzü (konfigürasyon ve veri okuma)
+    // AXI4-Lite Slave Arayüzü (CPU Erişim Portu)
     // -------------------------------------------------------------------
     input  logic [AXI_ADDR_W-1:0] s_axil_awaddr,
     input  logic                  s_axil_awvalid,
@@ -42,6 +45,22 @@ module uart_stream_peripheral #(
     input  logic                  s_axil_rready,
 
     // -------------------------------------------------------------------
+    // AXI4-Lite Master Arayüzü (YZ Belleği / SRAM Yazma Portu)
+    // -------------------------------------------------------------------
+    output logic [M_AXI_ADDR_W-1:0] m_axil_awaddr,
+    output logic                    m_axil_awvalid,
+    input  logic                    m_axil_awready,
+
+    output logic [AXI_DATA_W-1:0]   m_axil_wdata,
+    output logic [3:0]              m_axil_wstrb,
+    output logic                    m_axil_wvalid,
+    input  logic                    m_axil_wready,
+
+    input  logic [1:0]              m_axil_bresp,
+    input  logic                    m_axil_bvalid,
+    output logic                    m_axil_bready,
+
+    // -------------------------------------------------------------------
     // Fiziksel UART hatları
     // -------------------------------------------------------------------
     input  logic uart_rxd,
@@ -50,12 +69,12 @@ module uart_stream_peripheral #(
     // -------------------------------------------------------------------
     // Durum ve kesme çıkışları
     // -------------------------------------------------------------------
-    output logic uart_stream_irq,   // FIFO eşiği veya TX tamamlandı kesmesi
-    output logic fifo_empty,        // FIFO boş (YZ hızlandırıcısı için)
-    output logic fifo_full          // FIFO dolu (akış kontrolü için)
+    output logic uart_stream_irq,   
+    output logic fifo_empty,        
+    output logic fifo_full          
 );
 
-    // İçerideki lojikte kullanılacak paket sabitleri (Sentezleyici içi lokal tanımlar)
+    // Yazmaç Offsetleri
     localparam logic [7:0] UART_CPB_OFFSET         = 8'h00;
     localparam logic [7:0] UART_STP_OFFSET         = 8'h04;
     localparam logic [7:0] UART_RDR_OFFSET         = 8'h08;
@@ -64,6 +83,7 @@ module uart_stream_peripheral #(
     localparam logic [7:0] UARTS_FIFO_LEVEL_OFFSET = 8'h14;
     localparam logic [7:0] UARTS_FIFO_CLR_OFFSET   = 8'h18;
     localparam logic [7:0] UARTS_IRQ_EN_OFFSET     = 8'h1C;
+    localparam logic [7:0] UARTS_TARGET_OFFSET     = 8'h20; // YZ Hedef Adres Yazmacı (Yeni!)
 
     localparam int CFG_TX_EN   = 0;
     localparam int CFG_RX_DONE = 1;
@@ -72,15 +92,13 @@ module uart_stream_peripheral #(
     localparam logic [1:0] AXI_RESP_OKAY   = 2'b00;
     localparam logic [1:0] AXI_RESP_SLVERR = 2'b10;
 
-    localparam logic [1:0] STP_1   = 2'b00;
-    localparam logic [1:0] STP_1_5 = 2'b01;
-
-    // Yazmaç tanımları
+    // Yazmaçlar
     logic [31:0]          reg_cpb_r;
     logic [31:0]          reg_stp_r;
     logic [7:0]           reg_tdr_r;
     logic [2:0]           reg_cfg_r;
     logic [31:0]          reg_irq_en_r;
+    logic [M_AXI_ADDR_W-1:0] reg_target_addr_r; // Gömülü DMA için hedef adres yazmacı
 
     localparam logic [31:0] DEF_CPB = SYS_CLK_HZ / DEFAULT_BAUD;
 
@@ -90,7 +108,7 @@ module uart_stream_peripheral #(
     localparam int IRQ_TX_DONE    = 3;
     localparam int IRQ_FRAME_ERR  = 4;
 
-    // TX alt modülü bağları
+    // Alt modül bağlantıları
     logic tx_start_r;
     logic tx_done_w;
     logic tx_busy_w;
@@ -107,7 +125,6 @@ module uart_stream_peripheral #(
         .o_tx_done  (tx_done_w)
     );
 
-    // RX alt modülü bağları
     logic       rx_done_w;
     logic [7:0] rx_data_w;
     logic       rx_frame_err_w;
@@ -123,7 +140,7 @@ module uart_stream_peripheral #(
         .o_frame_err(rx_frame_err_w)
     );
 
-    // RX FIFO
+    // RX FIFO Sistemi
     logic              fifo_wr_en;
     logic              fifo_rd_en;
     logic [7:0]        fifo_rd_data;
@@ -151,6 +168,75 @@ module uart_stream_peripheral #(
 
     assign fifo_empty = fifo_empty_w;
     assign fifo_full  = fifo_full_w;
+
+    // -------------------------------------------------------------------
+    // GÖMÜLÜ DMA MANTIĞI: AXI4-Lite Master Durum Makinesi
+    // -------------------------------------------------------------------
+    typedef enum logic [1:0] {
+        M_IDLE   = 2'b00,
+        M_WRITE  = 2'b01,
+        M_RESP   = 2'b10
+    } m_state_t;
+
+    m_state_t m_state;
+    logic [M_AXI_ADDR_W-1:0] m_addr_counter_r; // Her yazmada otomatik artan adres sayacı
+
+    // FIFO'dan veri okuma tetiklemesi: Master IDLE durumunda ve FIFO boş değilse
+    assign fifo_rd_en = (m_state == M_IDLE) && !fifo_empty_w;
+
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            m_state          <= M_IDLE;
+            m_axil_awaddr    <= '0;
+            m_axil_awvalid   <= 1'b0;
+            m_axil_wdata     <= '0;
+            m_axil_wvalid    <= 1'b0;
+            m_axil_wstrb     <= 4'hF;
+            m_axil_bready    <= 1'b0;
+            m_addr_counter_r <= '0;
+        end else begin
+            case (m_state)
+                M_IDLE: begin
+                    m_axil_bready <= 1'b0;
+                    
+                    // İşlemci yeni adres kurduğunda sayacı güncelle
+                    if (s_axil_awvalid && s_axil_awready && (s_axil_awaddr[7:0] == UARTS_TARGET_OFFSET)) begin
+                        m_addr_counter_r <= s_axil_wdata;
+                    end
+
+                    // FIFO'dan veri okundu, aktarımı başlat
+                    if (fifo_rd_en) begin
+                        m_axil_awaddr  <= m_addr_counter_r;
+                        m_axil_awvalid <= 1'b1;
+                        m_axil_wdata   <= {24'b0, fifo_rd_data}; // Bayt verisini 32-bite genişlet
+                        m_axil_wvalid  <= 1'b1;
+                        m_state        <= M_WRITE;
+                    end
+                end
+
+                M_WRITE: begin
+                    // Adres ve Veri kanallarının el sıkışmalarını takip et
+                    if (m_axil_awready) m_axil_awvalid <= 1'b0;
+                    if (m_axil_wready)  m_axil_wvalid  <= 1'b0;
+
+                    if ((m_axil_awready || !m_axil_awvalid) && (m_axil_wready || !m_axil_wvalid)) begin
+                        m_axil_bready <= 1'b1;
+                        m_state       <= M_RESP;
+                    end
+                end
+
+                M_RESP: begin
+                    if (m_axil_bvalid) begin
+                        m_axil_bready    <= 1'b0;
+                        m_addr_counter_r <= m_addr_counter_r + 4; // Bir sonraki 32-bit kelime adresine geç
+                        m_state          <= M_IDLE;
+                    end
+                end
+                default: m_state <= M_IDLE;
+            endcase
+        end
+    end
+
 
     // Kesme üretimi
     logic irq_rx_done_s;
@@ -187,19 +273,20 @@ module uart_stream_peripheral #(
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            aw_active_r    <= 1'b0;
-            w_active_r     <= 1'b0;
-            aw_addr_r      <= '0;
-            s_axil_awready <= 1'b0;
-            s_axil_wready  <= 1'b0;
-            s_axil_bvalid  <= 1'b0;
-            s_axil_bresp   <= AXI_RESP_OKAY;
-            reg_cpb_r      <= DEF_CPB;
-            reg_stp_r      <= '0;
-            reg_tdr_r      <= '0;
-            reg_cfg_r      <= '0;
-            reg_irq_en_r   <= '0;
-            fifo_clr_r     <= 1'b0;
+            aw_active_r        <= 1'b0;
+            w_active_r         <= 1'b0;
+            aw_addr_r          <= '0;
+            s_axil_awready     <= 1'b0;
+            s_axil_wready      <= 1'b0;
+            s_axil_bvalid      <= 1'b0;
+            s_axil_bresp       <= AXI_RESP_OKAY;
+            reg_cpb_r          <= DEF_CPB;
+            reg_stp_r          <= '0;
+            reg_tdr_r          <= '0;
+            reg_cfg_r          <= '0;
+            reg_irq_en_r       <= '0;
+            reg_target_addr_r  <= '0;
+            fifo_clr_r         <= 1'b0;
         end else begin
             fifo_clr_r <= 1'b0;
 
@@ -245,6 +332,7 @@ module uart_stream_peripheral #(
                         if (s_axil_wdata[0]) fifo_clr_r <= 1'b1;
                     end
                     UARTS_IRQ_EN_OFFSET: reg_irq_en_r <= s_axil_wdata;
+                    UARTS_TARGET_OFFSET: reg_target_addr_r <= s_axil_wdata; // CPU hedef adresi buraya set eder
                     default: s_axil_bresp <= AXI_RESP_SLVERR;
                 endcase
             end
@@ -255,10 +343,6 @@ module uart_stream_peripheral #(
     end
 
     // AXI4-Lite Slave - Okuma Kanalı
-    assign fifo_rd_en = s_axil_arvalid && !s_axil_rvalid &&
-                        (s_axil_araddr[7:0] == UART_RDR_OFFSET) &&
-                        !fifo_empty_w;
-
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             s_axil_arready <= 1'b0;
@@ -279,6 +363,7 @@ module uart_stream_peripheral #(
                     UART_CFG_OFFSET:         s_axil_rdata <= {29'b0, reg_cfg_r};
                     UARTS_FIFO_LEVEL_OFFSET: s_axil_rdata <= {{(32-FIFO_PTR_W-1){1'b0}}, fifo_level};
                     UARTS_IRQ_EN_OFFSET:     s_axil_rdata <= reg_irq_en_r;
+                    UARTS_TARGET_OFFSET:     s_axil_rdata <= reg_target_addr_r;
                     default: begin
                         s_axil_rdata <= '0;
                         s_axil_rresp <= AXI_RESP_SLVERR;
