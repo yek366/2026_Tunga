@@ -7,11 +7,11 @@ Takımın tam TUNGA SoC FPGA blok tasarımı. Bir ekip arkadaşı Vivado proje a
 
 ## Proje bilgisi
 - **Vivado:** 2025.2
-- **Hedef kart:** Nexys 4 (Artix-7) — constraint `dis_mihraklar.xdc`'den:
+- **Hedef kart:** Nexys 4 (Artix-7) — constraint `nexys4_pins.xdc`'den:
   100 MHz clk (E3), reset C12 (active-low), UART C4/D4, JTAG PMOD JA,
-  QSPI flash pinleri, SPIx4 config. → [`constraints/dis_mihraklar.xdc`](constraints/dis_mihraklar.xdc)
+  QSPI flash pinleri, SPIx4 config. → [`constraints/nexys4_pins.xdc`](constraints/nexys4_pins.xdc)
 - **Part (ÇÖZÜLDÜ):** Doğru part = **`xc7a100t-csg324`** (Nexys 4 / Nexys A7).
-  Constraint (`dis_mihraklar.xdc`) bu kartın pinleri → kart kararı budur.
+  Constraint (`nexys4_pins.xdc`) bu kartın pinleri → kart kararı budur.
   Arşivdeki `.xpr`'de `xc7a12ticsg325-1L` yazıyor = **hatalı proje ayarı**;
   Vivado'da `set_property part xc7a100tcsg324-1 [current_project]` ile düzeltilmeli.
   (teknotest gate ayrı bir Vivado projesi; part'ı bağımsız.)
@@ -43,7 +43,7 @@ Arşivde **`write_bd_tcl` / `write_project_tcl` recreate scripti YOK** ve **`.bi
 YOK**. Jüri akışı tek script ile reproduce etmeli (şartname). Gereken:
 1. Vivado'da projeyi aç → `write_bd_tcl -force vivado/scripts/gozlem_design_2_bd.tcl`
 2. `write_project_tcl -force vivado/scripts/recreate_fpga_tunga.tcl`
-3. Pin constraint `.xdc` zaten repo'da: [`constraints/dis_mihraklar.xdc`](constraints/dis_mihraklar.xdc).
+3. Pin constraint `.xdc` zaten repo'da: [`constraints/nexys4_pins.xdc`](constraints/nexys4_pins.xdc).
 4. Bunları commit et → 55 MB binary yerine ~birkaç yüz KB script ile proje
    sıfırdan kurulabilir olur.
 
