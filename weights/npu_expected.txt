@@ -1,0 +1,5 @@
+class 2
+logit0 -128
+logit1 -128
+logit2 -126
+logit3 -128

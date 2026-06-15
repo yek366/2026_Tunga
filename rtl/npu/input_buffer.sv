@@ -2,87 +2,52 @@
 // Module : input_buffer
 // Project: TUNGA SoC — TEKNOFEST 2026
 // Author : Ali Salih Yıldırım
-// Date   : 2026-05-03
-// Desc   : Giriş verisi ve ağırlık geçici tamponu.
-//          DepthwiseConv2D için 10×8 kayan pencereye aynı anda erişim
-//          sağlamak üzere satır tamponu (line buffer) düzeni kullanılır.
-//          Bellek erişimini azaltır, hesaplama hızını artırır.
+// Desc   : NPU giriş + DepthwiseConv ağırlık on-chip tamponu.
+//          - input_mem : 1960 × INT8 (49×40×1 giriş spektrogramı, flat)
+//          - dw_w_mem  : 640  × INT8 (8 filtre × 10×8 DW ağırlığı, [c][kh][kw])
+//          İki yazma portu (loader/FSM'den), kombinasyonel okuma portları
+//          (DepthwiseConv kayan-pencere erişimi gecikmesiz).
+//
+//          NOT (çip akışı): Kombinasyonel okuma = fonksiyonel-önce seçim
+//          (sıralı MAC zamanlamasını basit tutar). ASIC/BRAM eşlemesinde
+//          kayıtlı-okuma + 1 boru hattı aşaması eklenecek (optimizasyon).
 // ============================================================
 
 `timescale 1ns/1ps
 
-module input_buffer #(
-    parameter int INPUT_SIZE  = 1960,
-    parameter int NUM_FILTERS = 8,
-    parameter int KERNEL_H    = 10,
-    parameter int KERNEL_W    = 8,
-    parameter int IN_W        = 40   // Giriş genişliği (frekans bölmesi sayısı)
-) (
+module input_buffer
+    import npu_pkg::*;
+(
     input  logic clk,
 
-    /* verilator lint_off UNUSEDSIGNAL */
-    input  logic rst_n,   // Gelecekteki reset mantığı için arayüzde tutulur
-    /* verilator lint_on UNUSEDSIGNAL */
+    // ---- Yazma portu A: giriş verisi (flat 0..INPUT_SIZE-1) ----
+    input  logic                          in_wr_en,
+    input  logic [$clog2(INPUT_SIZE)-1:0] in_wr_addr,
+    input  logic        [7:0]             in_wr_data,
 
-    // Yazma arayüzü (FSM'den — bellekten okunan veri)
-    input  logic        wr_en,
-    input  logic [7:0]  wr_data,           // INT8 giriş/ağırlık baytı
-    input  logic [12:0] wr_addr,           // Düz adres (0..WEIGHT_SIZE+INPUT_SIZE-1)
+    // ---- Yazma portu B: DW ağırlıkları (0..DW_WEIGHT_BYTES-1) ----
+    input  logic                              dw_w_wr_en,
+    input  logic [$clog2(DW_WEIGHT_BYTES)-1:0] dw_w_wr_addr,
+    input  logic        [7:0]                  dw_w_wr_data,
 
-    // Ağırlık okuma arayüzü (DepthwiseConv'a)
-    input  logic [9:0]  weight_rd_addr,    // 0..KERNEL_H*KERNEL_W*NUM_FILTERS-1
-    output logic signed [7:0] weight_data,
+    // ---- Okuma portu: giriş pikseli (DepthwiseConv'a) ----
+    input  logic [$clog2(INPUT_SIZE)-1:0] in_rd_addr,
+    output logic signed [7:0]             in_rd_data,
 
-    // Satır tamponu okuma arayüzü — KERNEL_H satıra paralel erişim
-    input  logic [5:0]  col_idx,           // Okunacak sütun indeksi (0..IN_W-1)
-    output logic signed [7:0] line_buf_data [0:KERNEL_H-1]
+    // ---- Okuma portu: DW ağırlığı (DepthwiseConv'a) ----
+    input  logic [$clog2(DW_WEIGHT_BYTES)-1:0] dw_w_rd_addr,
+    output logic signed [7:0]                  dw_w_rd_data
 );
 
-    // ---- Bellek boyut sabitleri ----
-    localparam int WEIGHT_SIZE   = NUM_FILTERS * KERNEL_H * KERNEL_W; // 640
-    localparam int WEIGHT_BITS   = $clog2(WEIGHT_SIZE);   // 10
-    localparam int INPUT_BITS    = $clog2(INPUT_SIZE);    // 11
-
-    // ---- Giriş SRAM tamponu (1960 × 8 bit) ----
     logic signed [7:0] input_mem [0:INPUT_SIZE-1];
+    logic signed [7:0] dw_w_mem  [0:DW_WEIGHT_BYTES-1];
 
-    // ---- Ağırlık SRAM tamponu (640 × 8 bit) ----
-    logic signed [7:0] weight_mem [0:WEIGHT_SIZE-1];
-
-    // ---- Yazma portu ----
-    // wr_addr < WEIGHT_SIZE → weight_mem
-    // wr_addr >= WEIGHT_SIZE → input_mem (ofset düşülür)
+    // Senkron yazma + senkron okuma (1 çevrim gecikme) → BRAM eşlenir
     always_ff @(posedge clk) begin
-        if (wr_en) begin
-            if (wr_addr < WEIGHT_SIZE[12:0]) begin
-                weight_mem[wr_addr[WEIGHT_BITS-1:0]] <= $signed(wr_data);
-            end else begin
-                automatic logic [INPUT_BITS-1:0] in_idx;
-                in_idx = INPUT_BITS'(wr_addr) - INPUT_BITS'(WEIGHT_SIZE);
-                input_mem[in_idx] <= $signed(wr_data);
-            end
-        end
+        if (in_wr_en)   input_mem[in_wr_addr]  <= $signed(in_wr_data);
+        if (dw_w_wr_en) dw_w_mem[dw_w_wr_addr]  <= $signed(dw_w_wr_data);
+        in_rd_data   <= input_mem[in_rd_addr];
+        dw_w_rd_data <= dw_w_mem[dw_w_rd_addr];
     end
-
-    // ---- Ağırlık okuma ----
-    assign weight_data = weight_mem[weight_rd_addr];
-
-    // ---- Satır tamponu ----
-    // DepthwiseConv2D'nin kayan penceresi için KERNEL_H ardışık satıra
-    // aynı anda erişim gerekir. Her satır bağımsız bir adres hesabıyla okunur.
-    // row_offset: konvolüsyon penceresinin başlangıç satırı (DW conv FSM'inden türetilir)
-    // Şimdilik row_offset=0 varsayımıyla satır tamponu erişimi gösterilmektedir;
-    // gerçek implementasyonda DW conv FSM'i row_offset'i sağlayacak.
-    genvar row;
-    generate
-        for (row = 0; row < KERNEL_H; row++) begin : gen_line_buf
-            always_comb begin
-                automatic logic [INPUT_BITS-1:0] flat_addr;
-                flat_addr = INPUT_BITS'(row * IN_W) + INPUT_BITS'(col_idx);
-                line_buf_data[row] = (flat_addr < INPUT_BITS'(INPUT_SIZE)) ?
-                                     input_mem[flat_addr] : 8'sh0;
-            end
-        end
-    endgenerate
 
 endmodule

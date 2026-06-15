@@ -2,172 +2,152 @@
 // Module : depthwise_conv2d
 // Project: TUNGA SoC — TEKNOFEST 2026
 // Author : Ali Salih Yıldırım
-// Date   : 2026-05-03
-// Desc   : DepthwiseConv2D + ReLU hesaplama motoru.
-//          Giriş: 49×40×1 INT8
-//          Kernel: 8 filtre × 10×8, stride 2
-//          Çıkış: 25×20×8 INT8 (ReLU sonrası, negatifler sıfırlanmış)
-//          Her filtre için 80 adet INT8×INT8→INT32 MAC işlemi yapılır.
-//          8 filtre sıralı çalışır (kaynak kısıtı için);
-//          paralel mimariye geçiş için NUM_PARALLEL parametresi eklenebilir.
+// Desc   : DepthwiseConv2D + per-channel requant + fused ReLU (INT8).
+//          Giriş 49×40×1, kernel 8×(10×8), stride 2, SAME padding,
+//          depth_multiplier=8 → çıkış 25×20×8 (4000 INT8).
+//          TFLite Micro referans çekirdeğiyle BIT-EXACT (npu_pkg requant).
+//
+//          BORU HATTI: on-chip tamponlar KAYITLI okuma (BRAM). Adres üretimi
+//          MAC'ten 1 çevrim önde gider; her çevrim bir önceki tap'in ağırlık×
+//          piksel çarpımı biriktirilir (1 MAC/çevrim, pencere başına 1 çevrim
+//          dolum). Padding geçerlilik bayrağı (vld_q) veriyle hizalı tutulur.
 // ============================================================
 
 `timescale 1ns/1ps
 
-module depthwise_conv2d #(
-    parameter int NUM_FILTERS  = 8,
-    parameter int KERNEL_H     = 10,
-    parameter int KERNEL_W     = 8,
-    parameter int STRIDE_W     = 2,   // Yatay stride (sütun yönü)
-    // OUT_H ve OUT_W değerleri şartnameden alınmıştır (padding dahil)
-    // Gerçek padding miktarı implementasyon sırasında netleştirilecek
-    parameter int OUT_H        = 25,
-    parameter int OUT_W        = 20,
-    parameter int ACCUM_WIDTH  = 32
-) (
+module depthwise_conv2d
+    import npu_pkg::*;
+(
     input  logic clk,
     input  logic rst_n,
 
-    // Kontrol
     input  logic start,
     output logic done,
 
-    // Giriş verisi — input_buffer'dan satır tamponu arayüzü
-    output logic [5:0]             col_rd_idx,
-    input  logic signed [7:0]      line_buf [0:KERNEL_H-1],
+    // ---- Quant parametreleri (per-channel) ----
+    input  logic signed [31:0] input_zp,
+    input  logic signed [31:0] out_zp,
+    input  logic signed [31:0] act_min,
+    input  logic signed [31:0] act_max,
+    input  logic signed [31:0] dw_mult  [0:NUM_FILTERS-1],
+    input  logic signed [31:0] dw_shift [0:NUM_FILTERS-1],
+    input  logic signed [31:0] dw_bias  [0:NUM_FILTERS-1],
 
-    // Ağırlık okuma
-    output logic [9:0]             weight_rd_addr,
-    input  logic signed [7:0]      weight_data,
+    // ---- Giriş pikseli okuma (input_buffer, KAYITLI: 1 çevrim gecikme) ----
+    output logic [$clog2(INPUT_SIZE)-1:0]      in_rd_addr,
+    input  logic signed [7:0]                  in_rd_data,
 
-    // Çıkış veri yazma arayüzü (local_buffer'a)
+    // ---- DW ağırlık okuma (input_buffer, KAYITLI) ----
+    output logic [$clog2(DW_WEIGHT_BYTES)-1:0] dw_w_rd_addr,
+    input  logic signed [7:0]                  dw_w_rd_data,
+
+    // ---- Çıkış yazma (local_buffer) ----
     output logic                   out_wr_en,
-    output logic [11:0]            out_wr_addr,   // 25*20*8 = 4000 < 2^12 = 4096
-    output logic signed [7:0]      out_wr_data    // INT8 (ReLU sonrası)
+    output logic [$clog2(FC_FLAT)-1:0] out_wr_addr,
+    output logic signed [7:0]      out_wr_data
 );
 
-    // ---- Durum makinesi ----
-    typedef enum logic [2:0] {
-        DW_IDLE,
-        DW_COMPUTE,
-        DW_RELU,
-        DW_WRITE,
-        DW_DONE
-    } dw_state_t;
+    localparam int WIN = KER_H * KER_W;   // 80 (pencere eleman sayısı)
 
+    typedef enum logic [1:0] {DW_IDLE, DW_RUN, DW_WRITE, DW_DONE} dw_state_t;
     dw_state_t state;
 
-    // ---- Sayaçlar ----
-    logic [$clog2(OUT_H)-1:0]        out_row;
-    logic [$clog2(OUT_W)-1:0]        out_col;
-    logic [$clog2(NUM_FILTERS)-1:0]  filter_idx;
-    logic [$clog2(KERNEL_H)-1:0]     krow;
-    logic [$clog2(KERNEL_W)-1:0]     kcol;
+    // Çıkış elemanı sayaçları
+    logic [$clog2(OUT_H)-1:0]       oh;
+    logic [$clog2(OUT_W)-1:0]       ow;
+    logic [$clog2(NUM_FILTERS)-1:0] c;
+    // Pencere MAC pozisyonu (0..WIN): adres fazı önde
+    logic [$clog2(WIN+1)-1:0]       wcnt;
 
-    // ---- Akümülatör ----
-    logic signed [ACCUM_WIDTH-1:0]   accumulator;
+    logic signed [31:0] acc;
+    logic               vld_q;     // bir önceki tap'in padding-geçerliliği (veriyle hizalı)
 
-    // ---- Ağırlık adresi hesaplama ----
-    // Ağırlık düzeni: [filtre][krow][kcol]
-    assign weight_rd_addr = (10'(filter_idx) * 10'(KERNEL_H * KERNEL_W)) +
-                            (10'(krow) * 10'(KERNEL_W)) +
-                            10'(kcol);
+    // ---- Adres üretimi (wcnt'ten; MAC'ten 1 çevrim önde) ----
+    logic [$clog2(KER_H)-1:0] kh;
+    logic [$clog2(KER_W)-1:0] kw;
+    assign kh = wcnt[$clog2(KER_W) +: $clog2(KER_H)];  // wcnt / KER_W
+    assign kw = wcnt[0 +: $clog2(KER_W)];              // wcnt % KER_W
 
-    // ---- Giriş adresi: kayan pencere ----
-    // Giriş satırı = out_row*STRIDE_H + krow
-    // Giriş sütunu = out_col*STRIDE_W + kcol
-    assign col_rd_idx = 6'(out_col * STRIDE_W + kcol);
+    logic addr_ph;                 // geçerli adres fazı (son tap'te dolum biter)
+    assign addr_ph = (wcnt < WIN[$clog2(WIN+1)-1:0]);
 
-    // ---- FSM ----
+    int   ih_i, iw_i;
+    logic in_valid;
+    always_comb begin
+        ih_i     = int'(oh) * STRIDE_H + int'(kh) - PAD_TOP;
+        iw_i     = int'(ow) * STRIDE_W + int'(kw) - PAD_LEFT;
+        in_valid = addr_ph && (ih_i >= 0) && (ih_i < IN_H) && (iw_i >= 0) && (iw_i < IN_W);
+    end
+
+    assign in_rd_addr   = ($clog2(INPUT_SIZE))'(in_valid ? (ih_i * IN_W + iw_i) : 0);
+    assign dw_w_rd_addr = ($clog2(DW_WEIGHT_BYTES))'(addr_ph ? (int'(c) * WIN + int'(wcnt)) : 0);
+
+    // ---- MAC çarpımı (KAYITLI tampon çıkışları + hizalı vld_q) ----
+    int pix, prod;
+    always_comb begin
+        pix  = vld_q ? (int'(in_rd_data) - input_zp) : 0;
+        prod = int'(dw_w_rd_data) * pix;
+    end
+
+    // ---- Çıkış (DW_WRITE'ta kombinasyonel) ----
+    logic signed [31:0] acc_biased;
+    assign acc_biased = acc + dw_bias[c];
+    assign out_wr_en   = (state == DW_WRITE);
+    assign out_wr_addr = ($clog2(FC_FLAT))'(
+                             int'(oh) * (OUT_W * OUT_C) + int'(ow) * OUT_C + int'(c));
+    assign out_wr_data = requant_relu(acc_biased, dw_mult[c], dw_shift[c],
+                                      out_zp, act_min, act_max);
+
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            state        <= DW_IDLE;
-            done         <= 1'b0;
-            out_wr_en    <= 1'b0;
-            accumulator  <= '0;
-            out_row      <= '0;
-            out_col      <= '0;
-            filter_idx   <= '0;
-            krow         <= '0;
-            kcol         <= '0;
+            state <= DW_IDLE;
+            done  <= 1'b0;
+            acc   <= '0;
+            vld_q <= 1'b0;
+            oh <= '0; ow <= '0; c <= '0; wcnt <= '0;
         end else begin
-            done      <= 1'b0;
-            out_wr_en <= 1'b0;
-
+            done <= 1'b0;
             case (state)
                 DW_IDLE: begin
                     if (start) begin
-                        out_row    <= '0;
-                        out_col    <= '0;
-                        filter_idx <= '0;
-                        krow       <= '0;
-                        kcol       <= '0;
-                        accumulator<= '0;
-                        state      <= DW_COMPUTE;
+                        oh <= '0; ow <= '0; c <= '0; wcnt <= '0;
+                        acc <= '0; vld_q <= 1'b0;
+                        state <= DW_RUN;
                     end
                 end
 
-                DW_COMPUTE: begin
-                    // MAC: accumulator += weight * input_pixel
-                    // input_pixel: line_buf[krow] sütun = col_rd_idx (kombinasyonel)
-                    accumulator <= accumulator +
-                        ($signed(weight_data) * $signed(line_buf[krow]));
-
-                    // Kernel sayaçlarını ilerlet
-                    if (kcol == KERNEL_W[($clog2(KERNEL_W))-1:0] - 1) begin
-                        kcol <= '0;
-                        if (krow == KERNEL_H[($clog2(KERNEL_H))-1:0] - 1) begin
-                            krow  <= '0;
-                            state <= DW_RELU;
-                        end else begin
-                            krow <= krow + 1'b1;
-                        end
+                DW_RUN: begin
+                    vld_q <= in_valid;                 // sonraki çevrim için hizala
+                    if (wcnt != '0) acc <= acc + prod; // bir önceki tap'in çarpımı
+                    if (wcnt == WIN[$clog2(WIN+1)-1:0]) begin
+                        wcnt  <= '0;
+                        vld_q <= 1'b0;
+                        state <= DW_WRITE;             // pencere tamam (80 birikim)
                     end else begin
-                        kcol <= kcol + 1'b1;
+                        wcnt <= wcnt + 1'b1;
                     end
-                end
-
-                DW_RELU: begin
-                    // ReLU: negatif → 0, pozitif saturate to INT8 max
-                    state <= DW_WRITE;
                 end
 
                 DW_WRITE: begin
-                    out_wr_en   <= 1'b1;
-                    // Düz çıkış adresi: (out_row * OUT_W * NUM_FILTERS) +
-                    //                   (out_col * NUM_FILTERS) + filter_idx
-                    out_wr_addr <= 12'(out_row) * 12'(OUT_W * NUM_FILTERS) +
-                                   12'(out_col) * 12'(NUM_FILTERS) +
-                                   12'(filter_idx);
-                    // INT8 saturasyon sonrası ReLU çıkışı
-                    if (accumulator <= 32'sh0)
-                        out_wr_data <= 8'sh0;
-                    else if (accumulator > 32'sh7F)
-                        out_wr_data <= 8'sh7F;
-                    else
-                        out_wr_data <= accumulator[7:0];
-
-                    accumulator <= '0;
-
-                    // Sonraki piksel için sayaçları ilerlet
-                    if (filter_idx == NUM_FILTERS[($clog2(NUM_FILTERS))-1:0] - 1) begin
-                        filter_idx <= '0;
-                        if (out_col == OUT_W[($clog2(OUT_W))-1:0] - 1) begin
-                            out_col <= '0;
-                            if (out_row == OUT_H[($clog2(OUT_H))-1:0] - 1) begin
-                                out_row <= '0;
-                                state   <= DW_DONE;
+                    // out_* kombinasyonel; local_buffer bu kenarda yakalar
+                    acc <= '0;
+                    if (c == 3'(OUT_C-1)) begin
+                        c <= '0;
+                        if (ow == 5'(OUT_W-1)) begin
+                            ow <= '0;
+                            if (oh == 5'(OUT_H-1)) begin
+                                state <= DW_DONE;
                             end else begin
-                                out_row <= out_row + 1'b1;
-                                state   <= DW_COMPUTE;
+                                oh <= oh + 1'b1;
+                                state <= DW_RUN;
                             end
                         end else begin
-                            out_col <= out_col + 1'b1;
-                            state   <= DW_COMPUTE;
+                            ow <= ow + 1'b1;
+                            state <= DW_RUN;
                         end
                     end else begin
-                        filter_idx <= filter_idx + 1'b1;
-                        state      <= DW_COMPUTE;
+                        c <= c + 1'b1;
+                        state <= DW_RUN;
                     end
                 end
 

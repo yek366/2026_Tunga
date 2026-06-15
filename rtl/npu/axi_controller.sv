@@ -2,11 +2,14 @@
 // Module : axi_controller
 // Project: TUNGA SoC — TEKNOFEST 2026
 // Author : Ali Salih Yıldırım
-// Date   : 2026-05-03
 // Desc   : NPU AXI denetleyicisi.
-//          - AXI4-Lite slave: CPU'dan CSR yazmaç erişimi (NPU_CTRL, NPU_STATUS,
-//            NPU_INPUT_ADDR, NPU_WEIGHT_ADDR, NPU_RESULT)
-//          - AXI4 master: 30 KB YZ belleğinden burst okuma / sonuç yazma
+//          - AXI4-Lite slave (CSR): CPU'dan NPU_CTRL/STATUS/INPUT_ADDR/
+//            WEIGHT_ADDR/RESULT erişimi.
+//          - AXI4 master okuma motoru: AI_MEM'den bayt akışı (tek-beat,
+//            tam AR/R handshake). FSM'e (rd_byte, rd_valid, rd_done) sunar.
+//          NOT: tek-beat (AxLEN=0) doğru ama yavaş; INCR burst sonraki
+//          optimizasyon (rd_len zaten beat sayısını taşıyor).
+//          Yazma kanalı kullanılmaz (sonuç CSR'dan okunur) → boşta.
 // ============================================================
 
 `timescale 1ns/1ps
@@ -39,7 +42,7 @@ module axi_controller #(
     output logic                      s_axil_rvalid,
     input  logic                      s_axil_rready,
 
-    // ---- AXI4 Master (YZ bellek erişimi) ----
+    // ---- AXI4 Master (AI_MEM erişimi) ----
     output logic [AXI_ID_WIDTH-1:0]   m_axi_awid,
     output logic [AXI_ADDR_WIDTH-1:0] m_axi_awaddr,
     output logic [7:0]                m_axi_awlen,
@@ -70,40 +73,35 @@ module axi_controller #(
     input  logic                      m_axi_rvalid,
     output logic                      m_axi_rready,
 
-    // ---- FSM arayüzü ----
-    // CSR → FSM
+    // ---- CSR → FSM ----
     output logic        csr_start,
     output logic [31:0] csr_input_addr,
     output logic [31:0] csr_weight_addr,
 
-    // FSM → CSR
+    // ---- FSM → CSR ----
     input  logic        fsm_done,
     input  logic        fsm_busy,
     input  logic [1:0]  fsm_result,
 
-    // FSM ↔ AXI4 master okuma kanalı
-    input  logic        mem_rd_req,
-    input  logic [31:0] mem_rd_addr,
-    input  logic [15:0] mem_rd_len,
-    output logic        mem_rd_valid,
-    output logic [7:0]  mem_rd_data,
-    output logic        mem_rd_last,
-
-    // FSM ↔ AXI4 master yazma kanalı
-    input  logic        mem_wr_req,
-    input  logic [31:0] mem_wr_addr,
-    input  logic [31:0] mem_wr_data,
-    output logic        mem_wr_done
+    // ---- FSM ↔ AXI okuma motoru ----
+    input  logic        rd_start,           // puls: okuma başlat
+    input  logic [31:0] rd_addr,            // başlangıç bayt adresi
+    input  logic [15:0] rd_len,             // beat sayısı - 1
+    output logic [7:0]  rd_byte,            // okunan bayt
+    output logic        rd_valid,           // beat geçerli (1 cyc)
+    output logic        rd_busy,
+    output logic        rd_done             // tüm beat'ler tamam (puls)
 );
 
-    // ---- CSR adres sabitleri ----
-    localparam logic [CSR_ADDR_WIDTH-1:0] NPU_CTRL_ADDR        = 8'h00;
-    localparam logic [CSR_ADDR_WIDTH-1:0] NPU_STATUS_ADDR      = 8'h04;
-    localparam logic [CSR_ADDR_WIDTH-1:0] NPU_INPUT_ADDR_REG   = 8'h08;
-    localparam logic [CSR_ADDR_WIDTH-1:0] NPU_WEIGHT_ADDR_REG  = 8'h0C;
-    localparam logic [CSR_ADDR_WIDTH-1:0] NPU_RESULT_ADDR      = 8'h10;
+    // ========================================================
+    // CSR adres sabitleri
+    // ========================================================
+    localparam logic [CSR_ADDR_WIDTH-1:0] NPU_CTRL_ADDR       = 8'h00;
+    localparam logic [CSR_ADDR_WIDTH-1:0] NPU_STATUS_ADDR     = 8'h04;
+    localparam logic [CSR_ADDR_WIDTH-1:0] NPU_INPUT_ADDR_REG  = 8'h08;
+    localparam logic [CSR_ADDR_WIDTH-1:0] NPU_WEIGHT_ADDR_REG = 8'h0C;
+    localparam logic [CSR_ADDR_WIDTH-1:0] NPU_RESULT_ADDR     = 8'h10;
 
-    // ---- CSR yazmaçları ----
     logic        reg_start;
     logic [31:0] reg_input_addr;
     logic [31:0] reg_weight_addr;
@@ -112,163 +110,166 @@ module axi_controller #(
     assign csr_input_addr  = reg_input_addr;
     assign csr_weight_addr = reg_weight_addr;
 
-    // ---- AXI4-Lite yazma state machine ----
-    typedef enum logic [1:0] {WR_IDLE, WR_ADDR, WR_DATA, WR_RESP} axil_wr_state_t;
+    // ---- AXI4-Lite YAZMA kanalı (combinational ready) ----
+    // Master aw+w'yi birlikte sunar (CV32E40P köprüsü / TB). ready'ler idle'da
+    // KOMBİNASYONEL yüksek → back-to-back transferlerde "registered ready 0'a
+    // ezilme" hatası yok; master ready=1'i aynı çevrimde gözlemler.
+    typedef enum logic [0:0] {W_IDLE, W_RESP} axil_wr_state_t;
     axil_wr_state_t wr_state;
 
-    logic [CSR_ADDR_WIDTH-1:0] wr_addr_lat;
-    logic [31:0]               wr_data_lat;
+    assign s_axil_awready = (wr_state == W_IDLE);
+    assign s_axil_wready  = (wr_state == W_IDLE);
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            wr_state        <= WR_IDLE;
+            wr_state        <= W_IDLE;
             reg_start       <= 1'b0;
             reg_input_addr  <= 32'h0;
             reg_weight_addr <= 32'h0;
-            s_axil_awready  <= 1'b0;
-            s_axil_wready   <= 1'b0;
             s_axil_bvalid   <= 1'b0;
             s_axil_bresp    <= 2'b00;
         end else begin
-            // START bitini tek çevrimde temizle (pulse)
-            if (reg_start) reg_start <= 1'b0;
-
+            if (reg_start) reg_start <= 1'b0;   // START tek-çevrim puls
             case (wr_state)
-                WR_IDLE: begin
-                    s_axil_awready <= 1'b1;
-                    s_axil_wready  <= 1'b1;
+                W_IDLE: begin
                     if (s_axil_awvalid && s_axil_wvalid) begin
-                        wr_addr_lat    <= s_axil_awaddr;
-                        wr_data_lat    <= s_axil_wdata;
-                        s_axil_awready <= 1'b0;
-                        s_axil_wready  <= 1'b0;
-                        wr_state       <= WR_RESP;
-                    end else if (s_axil_awvalid) begin
-                        wr_addr_lat    <= s_axil_awaddr;
-                        s_axil_awready <= 1'b0;
-                        wr_state       <= WR_DATA;
-                    end else if (s_axil_wvalid) begin
-                        wr_data_lat   <= s_axil_wdata;
-                        s_axil_wready <= 1'b0;
-                        wr_state      <= WR_ADDR;
+                        case (s_axil_awaddr)
+                            NPU_CTRL_ADDR:       reg_start       <= s_axil_wdata[0];
+                            NPU_INPUT_ADDR_REG:  reg_input_addr  <= s_axil_wdata;
+                            NPU_WEIGHT_ADDR_REG: reg_weight_addr <= s_axil_wdata;
+                            default: ;
+                        endcase
+                        s_axil_bvalid <= 1'b1;
+                        s_axil_bresp  <= 2'b00;
+                        wr_state      <= W_RESP;
                     end
                 end
-                WR_ADDR: begin
-                    s_axil_awready <= 1'b1;
-                    if (s_axil_awvalid) begin
-                        wr_addr_lat    <= s_axil_awaddr;
-                        s_axil_awready <= 1'b0;
-                        wr_state       <= WR_RESP;
-                    end
-                end
-                WR_DATA: begin
-                    s_axil_wready <= 1'b1;
-                    if (s_axil_wvalid) begin
-                        wr_data_lat   <= s_axil_wdata;
-                        s_axil_wready <= 1'b0;
-                        wr_state      <= WR_RESP;
-                    end
-                end
-                WR_RESP: begin
-                    // Yazmaç güncelle
-                    case (wr_addr_lat)
-                        NPU_CTRL_ADDR:       reg_start       <= wr_data_lat[0];
-                        NPU_INPUT_ADDR_REG:  reg_input_addr  <= wr_data_lat;
-                        NPU_WEIGHT_ADDR_REG: reg_weight_addr <= wr_data_lat;
-                        default: ;
-                    endcase
-                    s_axil_bvalid <= 1'b1;
-                    s_axil_bresp  <= 2'b00; // OKAY
+                W_RESP: begin
                     if (s_axil_bready) begin
                         s_axil_bvalid <= 1'b0;
-                        wr_state      <= WR_IDLE;
+                        wr_state      <= W_IDLE;
                     end
                 end
             endcase
         end
     end
 
-    // ---- AXI4-Lite okuma state machine ----
-    typedef enum logic [1:0] {RD_IDLE, RD_ADDR, RD_DATA} axil_rd_state_t;
-    axil_rd_state_t rd_state;
+    // ---- AXI4-Lite OKUMA kanalı (combinational ready) ----
+    typedef enum logic [0:0] {R_IDLE, R_RESP} axil_rd_state_t;
+    axil_rd_state_t rd_state_csr;
 
-    logic [CSR_ADDR_WIDTH-1:0] rd_addr_lat;
+    assign s_axil_arready = (rd_state_csr == R_IDLE);
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            rd_state       <= RD_IDLE;
-            s_axil_arready <= 1'b0;
-            s_axil_rvalid  <= 1'b0;
-            s_axil_rdata   <= 32'h0;
-            s_axil_rresp   <= 2'b00;
+            rd_state_csr  <= R_IDLE;
+            s_axil_rvalid <= 1'b0;
+            s_axil_rdata  <= 32'h0;
+            s_axil_rresp  <= 2'b00;
         end else begin
-            case (rd_state)
-                RD_IDLE: begin
-                    s_axil_arready <= 1'b1;
+            case (rd_state_csr)
+                R_IDLE: begin
                     if (s_axil_arvalid) begin
-                        rd_addr_lat    <= s_axil_araddr;
-                        s_axil_arready <= 1'b0;
-                        rd_state       <= RD_DATA;
+                        s_axil_rresp <= 2'b00;
+                        case (s_axil_araddr)
+                            NPU_CTRL_ADDR:       s_axil_rdata <= {31'h0, reg_start};
+                            NPU_STATUS_ADDR:     s_axil_rdata <= {30'h0, fsm_busy, fsm_done};
+                            NPU_INPUT_ADDR_REG:  s_axil_rdata <= reg_input_addr;
+                            NPU_WEIGHT_ADDR_REG: s_axil_rdata <= reg_weight_addr;
+                            NPU_RESULT_ADDR:     s_axil_rdata <= {30'h0, fsm_result};
+                            default:             s_axil_rdata <= 32'hDEAD_BEEF;
+                        endcase
+                        s_axil_rvalid <= 1'b1;
+                        rd_state_csr  <= R_RESP;
                     end
                 end
-                RD_DATA: begin
-                    s_axil_rvalid <= 1'b1;
-                    s_axil_rresp  <= 2'b00;
-                    case (rd_addr_lat)
-                        NPU_CTRL_ADDR:   s_axil_rdata <= {31'h0, reg_start};
-                        NPU_STATUS_ADDR: s_axil_rdata <= {30'h0, fsm_busy, fsm_done};
-                        NPU_INPUT_ADDR_REG:  s_axil_rdata <= reg_input_addr;
-                        NPU_WEIGHT_ADDR_REG: s_axil_rdata <= reg_weight_addr;
-                        NPU_RESULT_ADDR: s_axil_rdata <= {30'h0, fsm_result};
-                        default:         s_axil_rdata <= 32'hDEAD_BEEF;
-                    endcase
+                R_RESP: begin
                     if (s_axil_rready) begin
                         s_axil_rvalid <= 1'b0;
-                        rd_state      <= RD_IDLE;
+                        rd_state_csr  <= R_IDLE;
                     end
                 end
-                default: rd_state <= RD_IDLE;
             endcase
         end
     end
 
-    // ---- AXI4 Master okuma kanalı ----
-    // TODO: burst okuma FSM'i — implementasyon aşamasında tamamlanacak
-    // Aşağıdaki giriş sinyalleri stub FSM'de henüz kullanılmıyor
-    // Stub FSM'de henüz kullanılmayan giriş sinyalleri — burst FSM implementasyonunda kullanılacak
-    /* verilator lint_off UNUSEDSIGNAL */
-    logic _unused_axi = m_axi_arready | (|m_axi_rid) | (|m_axi_rresp)
-                      | (|m_axi_rdata[31:8]) | (|m_axi_awready) | m_axi_wready
-                      | (|m_axi_bid) | (|m_axi_bresp) | (|mem_rd_len)
-                      | (|s_axil_wstrb);
-    /* verilator lint_on UNUSEDSIGNAL */
+    // ========================================================
+    // AXI4 Master okuma motoru (tek-beat, tam handshake)
+    // ========================================================
+    typedef enum logic [1:0] {M_IDLE, M_AR, M_DATA} rd_eng_state_t;
+    rd_eng_state_t r_state;
 
-    assign m_axi_arid     = '0;
-    assign m_axi_araddr   = mem_rd_req ? mem_rd_addr : '0;
-    assign m_axi_arlen    = '0;        // tek beat — burst ileride eklenecek
-    assign m_axi_arsize   = 3'b000;   // 1 byte
-    assign m_axi_arburst  = 2'b01;    // INCR
-    assign m_axi_arvalid  = mem_rd_req;
-    assign m_axi_rready   = 1'b1;
-    assign mem_rd_valid   = m_axi_rvalid;
-    assign mem_rd_data    = m_axi_rdata[7:0];
-    assign mem_rd_last    = m_axi_rlast;
+    logic [31:0] r_base;
+    logic [16:0] r_total;   // beat sayısı (rd_len+1, 0..65536)
+    logic [16:0] r_cnt;
 
-    // ---- AXI4 Master yazma kanalı ----
-    // TODO: yazma FSM'i — implementasyon aşamasında tamamlanacak
-    assign m_axi_awid     = '0;
-    assign m_axi_awaddr   = mem_wr_req ? mem_wr_addr : '0;
-    assign m_axi_awlen    = 8'h00;
-    assign m_axi_awsize   = 3'b010;   // 4 byte
-    assign m_axi_awburst  = 2'b01;    // INCR
-    assign m_axi_awvalid  = mem_wr_req;
-    assign m_axi_wdata    = mem_wr_data;
-    assign m_axi_wstrb    = 4'hF;
-    assign m_axi_wlast    = 1'b1;
-    assign m_axi_wvalid   = mem_wr_req;
-    assign m_axi_bready   = 1'b1;
-    assign mem_wr_done    = m_axi_bvalid;
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            r_state <= M_IDLE;
+            r_base  <= 32'h0;
+            r_total <= 17'h0;
+            r_cnt   <= 17'h0;
+            rd_done <= 1'b0;
+        end else begin
+            rd_done <= 1'b0;
+            case (r_state)
+                M_IDLE: begin
+                    if (rd_start) begin
+                        r_base  <= rd_addr;
+                        r_total <= {1'b0, rd_len} + 17'h1;
+                        r_cnt   <= 17'h0;
+                        r_state <= M_AR;
+                    end
+                end
+                M_AR: begin
+                    if (m_axi_arready) r_state <= M_DATA;
+                end
+                M_DATA: begin
+                    if (m_axi_rvalid) begin
+                        if (r_cnt + 17'h1 == r_total) begin
+                            rd_done <= 1'b1;
+                            r_state <= M_IDLE;
+                        end else begin
+                            r_cnt   <= r_cnt + 17'h1;
+                            r_state <= M_AR;
+                        end
+                    end
+                end
+                default: r_state <= M_IDLE;
+            endcase
+        end
+    end
 
-    // (Yazma kanalı stub sinyalleri _unused_axi içinde zaten kapsanıyor)
+    assign rd_busy  = (r_state != M_IDLE);
+    assign rd_valid = (r_state == M_DATA) && m_axi_rvalid;
+    assign rd_byte  = m_axi_rdata[7:0];
+
+    // AR kanalı
+    assign m_axi_arid    = '0;
+    assign m_axi_araddr  = r_base + {15'h0, r_cnt};
+    assign m_axi_arlen   = 8'h00;     // tek-beat
+    assign m_axi_arsize  = 3'b000;    // 1 bayt
+    assign m_axi_arburst = 2'b01;     // INCR
+    assign m_axi_arvalid = (r_state == M_AR);
+    assign m_axi_rready  = (r_state == M_DATA);
+
+    // Yazma kanalı kullanılmıyor — boşta tut
+    assign m_axi_awid    = '0;
+    assign m_axi_awaddr  = '0;
+    assign m_axi_awlen   = '0;
+    assign m_axi_awsize  = 3'b000;
+    assign m_axi_awburst = 2'b01;
+    assign m_axi_awvalid = 1'b0;
+    assign m_axi_wdata   = '0;
+    assign m_axi_wstrb   = '0;
+    assign m_axi_wlast   = 1'b0;
+    assign m_axi_wvalid  = 1'b0;
+    assign m_axi_bready  = 1'b1;
+
+    // Kullanılmayan giriş sinyalleri (lint)
+    logic _unused;
+    assign _unused = (|s_axil_wstrb) | (|m_axi_bid) | (|m_axi_bresp) | m_axi_bvalid
+                   | (|m_axi_rid) | (|m_axi_rresp) | m_axi_rlast | (|m_axi_rdata[31:8])
+                   | m_axi_awready | m_axi_wready;
 
 endmodule

@@ -67,3 +67,13 @@ NASIL_KULLANILIR.md
 
 # Weights (büyük binary dosyalar; gerekiyorsa LFS)
 weights/*.bin
+
+# Scratch / gelen kutusu (repo dışı — büyük zip + ham FPGA arşivleri)
+inbox/
+
+# Teknotest referans iskeletleri (boş örnek paketler — commit edilmez)
+teknotest_pack/
+teknotest_example/
+
+# Self-test / golden yeniden-üretim çıktıları (script üretir)
+**/_selftest_out/

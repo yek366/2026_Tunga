@@ -20,10 +20,12 @@ TB_DIR     := $(REPO_ROOT)/tb
 SIM_DIR    := $(REPO_ROOT)/sim
 OBJ_DIR    := $(REPO_ROOT)/obj_dir
 
-# ---- NPU RTL dosyaları ----
+# ---- NPU RTL dosyaları (npu_pkg ÖNCE) ----
 NPU_RTL := \
+    $(RTL_DIR)/npu/npu_pkg.sv           \
     $(RTL_DIR)/npu/local_buffer.sv      \
     $(RTL_DIR)/npu/input_buffer.sv      \
+    $(RTL_DIR)/npu/fc_weight_buffer.sv  \
     $(RTL_DIR)/npu/softmax_argmax.sv    \
     $(RTL_DIR)/npu/fully_connected.sv   \
     $(RTL_DIR)/npu/depthwise_conv2d.sv  \
@@ -32,6 +34,10 @@ NPU_RTL := \
     $(RTL_DIR)/npu/npu_top.sv
 
 NPU_TB := $(TB_DIR)/npu/npu_tb.sv
+
+# Requant birim testi (quant_requant standalone)
+REQUANT_RTL := $(RTL_DIR)/npu/npu_pkg.sv $(RTL_DIR)/npu/quant_requant.sv
+REQUANT_TB  := $(TB_DIR)/npu/requant_tb.sv
 
 # ---- Verilator bayrakları ----
 VFLAGS := \

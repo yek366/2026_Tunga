@@ -63,7 +63,7 @@ module softmax_argmax #(
                         max_idx <= 2'(idx);
                     end
 
-                    if (idx == NUM_CLASSES[$clog2(NUM_CLASSES)-1:0] - 1) begin
+                    if (idx == ($clog2(NUM_CLASSES))'(NUM_CLASSES - 1)) begin
                         idx   <= '0;
                         state <= AM_DONE;
                     end else begin

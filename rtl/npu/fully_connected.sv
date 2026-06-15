@@ -2,112 +2,106 @@
 // Module : fully_connected
 // Project: TUNGA SoC — TEKNOFEST 2026
 // Author : Ali Salih Yıldırım
-// Date   : 2026-05-03
-// Desc   : FullyConnected (Dense) katmanı.
-//          Giriş: 4000 × INT8 (DepthwiseConv çıkışı, flatten sonrası)
-//          Ağırlık: 4×4000 INT8 matris + 4 × INT32 bias
-//          Çıkış: 4 × INT32 ham puan (logit) — softmax/argmax için
-//          Her nöron için 4000 adet INT8 MAC → INT32 akümülatör
+// Desc   : FullyConnected (Dense) — INT8 MAC → per-channel requant → INT8 logit.
+//          4 nöron × 4000 giriş. Giriş = DW çıkışı (flatten, INT8).
+//            acc[n] = Σ w[n][i] * (in[i] - fc_input_zp) + bias[n]
+//            logit[n] = requant(acc[n], mult[n], shift[n]) + fc_out_zp  (INT8)
+//          Gerçek tiny_conv FC'si PER-CHANNEL quantize (4 ayrı ölçek);
+//          argmax requant'lı int8 logit üzerinde (TFLite sınıfıyla aynı).
+//
+//          BORU HATTI: local_buffer + fc_weight_buffer KAYITLI okuma (BRAM);
+//          adres MAC'ten 1 çevrim önde, çarpım gecikmeli biriktirilir.
 // ============================================================
 
 `timescale 1ns/1ps
 
-module fully_connected #(
-    parameter int NUM_OUTPUTS  = 4,
-    parameter int NUM_INPUTS   = 4000,
-    parameter int DATA_WIDTH   = 8,
-    parameter int ACCUM_WIDTH  = 32,
-    parameter int BIAS_WIDTH   = 32
-) (
+module fully_connected
+    import npu_pkg::*;
+(
     input  logic clk,
     input  logic rst_n,
 
-    // Kontrol
     input  logic start,
     output logic done,
 
-    // Giriş veri okuma (local_buffer'dan)
-    output logic [$clog2(NUM_INPUTS)-1:0]            in_rd_addr,
-    input  logic signed [DATA_WIDTH-1:0]             in_data,
+    input  logic signed [31:0] fc_input_zp,
+    input  logic signed [31:0] fc_bias  [0:FC_OUTPUTS-1],
+    input  logic signed [31:0] fc_mult  [0:FC_OUTPUTS-1],
+    input  logic signed [31:0] fc_shift [0:FC_OUTPUTS-1],
+    input  logic signed [31:0] fc_out_zp,
 
-    // Ağırlık okuma (weight_buffer'dan)
-    output logic [$clog2(NUM_OUTPUTS*NUM_INPUTS)-1:0] weight_rd_addr,
-    input  logic signed [DATA_WIDTH-1:0]              weight_data,
+    // Giriş okuma (local_buffer, KAYITLI: 1 çevrim gecikme)
+    output logic [$clog2(FC_FLAT)-1:0]  in_rd_addr,
+    input  logic signed [7:0]           in_data,
 
-    // Bias okuma
-    output logic [$clog2(NUM_OUTPUTS)-1:0]           bias_rd_addr,
-    input  logic signed [BIAS_WIDTH-1:0]             bias_data,
+    // Ağırlık okuma (fc_weight_buffer, KAYITLI)
+    output logic [$clog2(FC_WEIGHT_BYTES)-1:0] weight_rd_addr,
+    input  logic signed [7:0]                  weight_data,
 
-    // Çıkış — 4 × INT32 logit
-    output logic signed [ACCUM_WIDTH-1:0]            logits [0:NUM_OUTPUTS-1],
-    output logic                                     logits_valid
+    // Çıkış logit'leri (per-channel requant sonrası INT8)
+    output logic signed [7:0]  logits [0:FC_OUTPUTS-1],
+    output logic               logits_valid
 );
 
-    typedef enum logic [1:0] {FC_IDLE, FC_COMPUTE, FC_BIAS, FC_DONE} fc_state_t;
+    typedef enum logic [1:0] {FC_IDLE, FC_RUN, FC_STORE, FC_DONE} fc_state_t;
     fc_state_t state;
 
-    logic [$clog2(NUM_OUTPUTS)-1:0]  neuron_idx;
-    logic [$clog2(NUM_INPUTS)-1:0]   input_idx;
+    logic [$clog2(FC_OUTPUTS)-1:0]  n;
+    logic [$clog2(FC_FLAT+1)-1:0]   icnt;   // 0..FC_FLAT (adres fazı önde)
+    logic signed [31:0]             acc;
 
-    // Her nöron için ayrı akümülatör
-    logic signed [ACCUM_WIDTH-1:0]   acc [0:NUM_OUTPUTS-1];
+    logic addr_ph;
+    assign addr_ph = (icnt < FC_FLAT[$clog2(FC_FLAT+1)-1:0]);
 
-    assign in_rd_addr     = input_idx;
-    assign weight_rd_addr = ($clog2(NUM_OUTPUTS*NUM_INPUTS))'(neuron_idx) *
-                            ($clog2(NUM_OUTPUTS*NUM_INPUTS))'(NUM_INPUTS) +
-                            ($clog2(NUM_OUTPUTS*NUM_INPUTS))'(input_idx);
-    assign bias_rd_addr   = neuron_idx;
+    assign in_rd_addr     = ($clog2(FC_FLAT))'(addr_ph ? icnt : '0);
+    assign weight_rd_addr = ($clog2(FC_WEIGHT_BYTES))'(
+                                int'(n) * FC_FLAT + (addr_ph ? int'(icnt) : 0));
+
+    // MAC çarpımı (KAYITLI tampon çıkışları — in_data/weight_data hizalı)
+    int term, prod;
+    always_comb begin
+        term = int'(in_data) - fc_input_zp;
+        prod = int'(weight_data) * term;
+    end
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             state        <= FC_IDLE;
             done         <= 1'b0;
             logits_valid <= 1'b0;
-            neuron_idx   <= '0;
-            input_idx    <= '0;
-            for (int i = 0; i < NUM_OUTPUTS; i++) begin
-                acc[i]    <= '0;
-                logits[i] <= '0;
-            end
+            n <= '0; icnt <= '0; acc <= '0;
+            for (int k = 0; k < FC_OUTPUTS; k++) logits[k] <= '0;
         end else begin
             done         <= 1'b0;
             logits_valid <= 1'b0;
-
             case (state)
                 FC_IDLE: begin
                     if (start) begin
-                        neuron_idx <= '0;
-                        input_idx  <= '0;
-                        for (int i = 0; i < NUM_OUTPUTS; i++)
-                            acc[i] <= '0;
-                        state <= FC_COMPUTE;
+                        n <= '0; icnt <= '0; acc <= '0;
+                        state <= FC_RUN;
                     end
                 end
 
-                FC_COMPUTE: begin
-                    // MAC: acc[neuron] += weight * input
-                    acc[neuron_idx] <= acc[neuron_idx] +
-                        ($signed(weight_data) * $signed(in_data));
-
-                    if (input_idx == NUM_INPUTS[$clog2(NUM_INPUTS)-1:0] - 1) begin
-                        input_idx <= '0;
-                        state     <= FC_BIAS;
+                FC_RUN: begin
+                    if (icnt != '0) acc <= acc + prod;   // bir önceki giriş çarpımı
+                    if (icnt == FC_FLAT[$clog2(FC_FLAT+1)-1:0]) begin
+                        state <= FC_STORE;               // 4000 birikim tamam
                     end else begin
-                        input_idx <= input_idx + 1'b1;
+                        icnt <= icnt + 1'b1;
                     end
                 end
 
-                FC_BIAS: begin
-                    // Bias ekle
-                    logits[neuron_idx] <= acc[neuron_idx] + bias_data;
-
-                    if (neuron_idx == NUM_OUTPUTS[$clog2(NUM_OUTPUTS)-1:0] - 1) begin
-                        neuron_idx <= '0;
-                        state      <= FC_DONE;
+                FC_STORE: begin
+                    // acc + bias (int32 sarma) → per-channel requant + fc_out_zp → INT8
+                    logits[n] <= requant_relu(acc + fc_bias[n], fc_mult[n], fc_shift[n],
+                                              fc_out_zp, -32'sd128, 32'sd127);
+                    acc  <= '0;
+                    icnt <= '0;
+                    if (n == 2'(FC_OUTPUTS-1)) begin
+                        state <= FC_DONE;
                     end else begin
-                        neuron_idx <= neuron_idx + 1'b1;
-                        input_idx  <= '0;
-                        state      <= FC_COMPUTE;
+                        n     <= n + 1'b1;
+                        state <= FC_RUN;
                     end
                 end
 
@@ -116,6 +110,7 @@ module fully_connected #(
                     logits_valid <= 1'b1;
                     state        <= FC_IDLE;
                 end
+                default: state <= FC_IDLE;
             endcase
         end
     end
