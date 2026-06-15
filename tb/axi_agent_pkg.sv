@@ -132,4 +132,37 @@ package axi_agent_pkg;
       end
     endfunction
   endclass
+  // 6. Scoreboard
+  class axi_scoreboard extends uvm_scoreboard;
+    `uvm_component_utils(axi_scoreboard)
+    uvm_tlm_analysis_fifo #(axi_transaction) item_fifo;
+    
+    // Referans bellek modeli (Associative array)
+    bit [31:0] ref_mem [int];
+
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+        item_fifo = new("item_fifo", this);
+    endfunction
+
+    task run_phase(uvm_phase phase);
+        axi_transaction tr;
+        forever begin
+            item_fifo.get(tr);
+            if (tr.is_write) begin
+                ref_mem[tr.addr] = tr.data; // Referans modeli guncelle
+                `uvm_info("SCB_WRITE", $sformatf("Yazildi -> Adres: 0x%0h, Veri: 0x%0h", tr.addr, tr.data), UVM_HIGH)
+            end else begin
+                // Okuma verisini kontrol et
+                if (ref_mem.exists(tr.addr)) begin
+                    if (ref_mem[tr.addr] !== tr.data)
+                        `uvm_error("SCB_FAIL", $sformatf("Veri Uyusmazligi! Adres: 0x%0h | Beklenen: 0x%0h, Gelen: 0x%0h", tr.addr, ref_mem[tr.addr], tr.data))
+                    else
+                        `uvm_info("SCB_PASS", $sformatf("Basarili Okuma -> Adres: 0x%0h, Veri: 0x%0h", tr.addr, tr.data), UVM_LOW)
+                end
+            end
+        end
+    endtask
+  endclass
+
 endpackage

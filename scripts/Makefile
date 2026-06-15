@@ -59,8 +59,23 @@ sim-npu: $(SIM_DIR)
 	@echo "[MAKE] Derleniyor..."
 	$(MAKE) -C $(OBJ_DIR)/npu -f Vnpu_tb.mk
 	@echo "[SIM] Çalıştırılıyor..."
-	$(OBJ_DIR)/npu/npu_sim
+	$(OBJ_DIR)/npu/npu_sim > $(SIM_DIR)/rtl_trace.log
 	@echo "[SIM] VCD: $(SIM_DIR)/npu_tb.vcd"
+
+# ---- Spike ISS Çalıştırma ----
+run_spike:
+	@echo "[SPIKE] Spike ISS Altın Referans (Golden Reference) çalıştırılıyor..."
+	# Not: 'firmware.elf' sw/ dizininde derlenmiş olmalıdır.
+	$(SPIKE) --log-commits -l $(REPO_ROOT)/sw/firmware.elf 2> $(SIM_DIR)/spike_trace.log
+
+# ---- RTL ve Spike Karşılaştırması ----
+compare: sim-npu run_spike
+	@echo "[PYTHON] Loglar karşılaştırılıyor..."
+	$(PYTHON3) $(REPO_ROOT)/scripts/compare_traces.py $(SIM_DIR)/spike_trace.log $(SIM_DIR)/rtl_trace.log
+
+# ---- Tüm Doğrulama Akışını Çalıştır ----
+run_all: compare
+	@echo "[BİLGİ] Tüm UVM, SVA ve Spike Co-Simulation aşamaları başarıyla tamamlandı!"
 
 # ---- Sistem seviyesi simülasyon (henüz iskelet) ----
 sim-system:

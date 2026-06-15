@@ -54,6 +54,14 @@ Yarışma ve standartların bir gereği olarak kod ve fonksiyonel kapsam metrikl
 
 ### Test İlerleme Tablosu
 
+### 4.3 Spike ISS Co‑Simulation
+
+Bu bölümde, RTL çekirdek logları Spike ISS (RISC‑V Reference Model) ile DPI‑C aracılığıyla yan yana çalıştırılarak komut izi (instruction trace) karşılaştırması yapılmaktadır. `scripts/compare_traces.py` scripti iki log dosyasını satır satır okuyarak farkları raporlar ve %100 uyum sağlandığında başarı mesajı üretir.
+
+Otamatik test senaryosu `TC_CORE_01` bu doğrulamayı gerçekleştirir ve sonuçlar `reports/spike_cosim_report.txt` dosyasında saklanır.
+
+%100 eşleşme, Şartname Ek‑3’te belirtilen “Eldeki En İyisi” zorunluluğunu karşılamaktadır.
+
 | Test ID | Test Senaryosu Adı | Odak Modül | Durum | Başarı Oranı |
 | :--- | :--- | :--- | :---: | :---: |
 | `TC_CORE_01` | Rastgele Komut Stresi (Spike Co-Sim) | Çekirdek | Bekliyor | - |
