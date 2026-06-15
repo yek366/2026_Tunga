@@ -1,5 +1,8 @@
 `timescale 1ns / 1ps
-// 2-Master, 8-Slave AXI-Lite interconnect
+// ==============================================================================
+//  axi_lite_interconnect.sv
+//  2-Master, 10-Slave AXI-Lite Interconnect Module
+// ==============================================================================
 
 import axi_pkg::*;
 import memory_map_pkg::*;
@@ -16,8 +19,8 @@ module axi_lite_interconnect #(
     output rsp_t [1:0] master_rsp_o,
 
     // Slave Ports (to memories/peripherals)
-    output req_t [7:0] slave_req_o,
-    input  rsp_t [7:0] slave_rsp_i
+    output req_t [9:0] slave_req_o,
+    input  rsp_t [9:0] slave_rsp_i
 );
 
   // Address Decoder Function
@@ -26,18 +29,22 @@ module axi_lite_interconnect #(
       return 0; // ROM
     else if (addr >= memory_map_pkg::SRAM_BASE_ADDR && addr <= memory_map_pkg::SRAM_HIGH_ADDR)
       return 1; // SRAM
-    else if (addr >= memory_map_pkg::UART_BASE_ADDR && addr <= memory_map_pkg::UART_HIGH_ADDR)
-      return 2; // UART
+    else if (addr >= memory_map_pkg::UART_STREAM_BASE_ADDR && addr <= memory_map_pkg::UART_STREAM_HIGH_ADDR)
+      return 2; // UART Stream
+    else if (addr >= memory_map_pkg::UART_CTRL_BASE_ADDR && addr <= memory_map_pkg::UART_CTRL_HIGH_ADDR)
+      return 3; // UART Control
     else if (addr >= memory_map_pkg::GPIO_BASE_ADDR && addr <= memory_map_pkg::GPIO_HIGH_ADDR)
-      return 3; // GPIO
+      return 4; // GPIO
     else if (addr >= memory_map_pkg::TIMER_BASE_ADDR && addr <= memory_map_pkg::TIMER_HIGH_ADDR)
-      return 4; // TIMER
+      return 5; // TIMER
     else if (addr >= memory_map_pkg::I2C_BASE_ADDR && addr <= memory_map_pkg::I2C_HIGH_ADDR)
-      return 5; // I2C
+      return 6; // I2C
     else if (addr >= memory_map_pkg::QSPI_BASE_ADDR && addr <= memory_map_pkg::QSPI_HIGH_ADDR)
-      return 6; // QSPI
+      return 7; // QSPI
     else if (addr >= memory_map_pkg::NPU_BASE_ADDR && addr <= memory_map_pkg::NPU_HIGH_ADDR)
-      return 7; // NPU
+      return 8; // NPU CSR
+    else if (addr >= memory_map_pkg::INTC_BASE_ADDR && addr <= memory_map_pkg::INTC_HIGH_ADDR)
+      return 9; // INTC
     else
       return -1; // Decode error / Unmapped
   endfunction
@@ -50,15 +57,13 @@ module axi_lite_interconnect #(
     m1_aw_sel = decode_address(master_req_i[1].aw.addr);
   end
 
-  // Write channel routing will be handled in the unified always_comb block at the bottom
-
   always_comb begin
     master_rsp_o[1].aw_ready = 1'b0;
     master_rsp_o[1].w_ready  = 1'b0;
     master_rsp_o[1].b        = '0;
     master_rsp_o[1].b_valid  = 1'b0;
 
-    if (m1_aw_sel >= 0 && m1_aw_sel < 8) begin
+    if (m1_aw_sel >= 0 && m1_aw_sel < 10) begin
       master_rsp_o[1].aw_ready = slave_rsp_i[m1_aw_sel].aw_ready;
       master_rsp_o[1].w_ready  = slave_rsp_i[m1_aw_sel].w_ready;
       master_rsp_o[1].b        = slave_rsp_i[m1_aw_sel].b;
@@ -82,12 +87,12 @@ module axi_lite_interconnect #(
   end
 
   // Read request arbiter signals per slave
-  logic [7:0] m0_read_req;
-  logic [7:0] m1_read_req;
-  logic [7:0] ar_granted_master; // 0 = Master 0, 1 = Master 1
+  logic [9:0] m0_read_req;
+  logic [9:0] m1_read_req;
+  logic [9:0] ar_granted_master; // 0 = Master 0, 1 = Master 1
 
   always_comb begin
-    for (int i = 0; i < 8; i++) begin
+    for (int i = 0; i < 10; i++) begin
       m0_read_req[i] = master_req_i[0].ar_valid && (m0_ar_sel == i);
       m1_read_req[i] = master_req_i[1].ar_valid && (m1_ar_sel == i);
 
@@ -106,8 +111,6 @@ module axi_lite_interconnect #(
     end
   end
 
-  // Read address channel routing will be handled in the unified always_comb block at the bottom
-
   // Route ar_ready back to Master 0 and Master 1
   always_comb begin
     master_rsp_o[0].ar_ready = 1'b0;
@@ -118,7 +121,7 @@ module axi_lite_interconnect #(
     end
 
     master_rsp_o[1].ar_ready = 1'b0;
-    if (m1_ar_sel >= 0 && m1_ar_sel < 8) begin
+    if (m1_ar_sel >= 0 && m1_ar_sel < 10) begin
       if (m1_ar_sel == 0 || m1_ar_sel == 1) begin
         if (ar_granted_master[m1_ar_sel] == 1'b1) begin
           master_rsp_o[1].ar_ready = slave_rsp_i[m1_ar_sel].ar_ready;
@@ -133,14 +136,14 @@ module axi_lite_interconnect #(
   // READ RESPONSE TRACKING AND ROUTING
   // ---------------------------------------------------------------------------
   // For each slave, track the Master ID of outstanding read requests
-  logic [1:0] read_tracker_wptr  [8];
-  logic [1:0] read_tracker_rptr  [8];
-  logic [3:0] read_tracker_empty [8];
-  logic       read_tracker_val   [8][4];
+  logic [1:0] read_tracker_wptr  [10];
+  logic [1:0] read_tracker_rptr  [10];
+  logic [3:0] read_tracker_empty [10];
+  logic       read_tracker_val   [10][4];
 
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
-      for (int i = 0; i < 8; i++) begin
+      for (int i = 0; i < 10; i++) begin
         read_tracker_wptr[i]  <= '0;
         read_tracker_rptr[i]  <= '0;
         read_tracker_empty[i] <= 4'b1111;
@@ -149,7 +152,7 @@ module axi_lite_interconnect #(
         end
       end
     end else begin
-      for (int i = 0; i < 8; i++) begin
+      for (int i = 0; i < 10; i++) begin
         // Push granted master ID to tracker
         if (slave_req_o[i].ar_valid && slave_rsp_i[i].ar_ready) begin
           read_tracker_val[i][read_tracker_wptr[i]]  <= ar_granted_master[i];
@@ -166,11 +169,11 @@ module axi_lite_interconnect #(
   end
 
   // Identify active valid read responses per slave
-  logic [7:0] active_master;
-  logic [7:0] r_valid_active;
+  logic [9:0] active_master;
+  logic [9:0] r_valid_active;
 
   always_comb begin
-    for (int i = 0; i < 8; i++) begin
+    for (int i = 0; i < 10; i++) begin
       active_master[i]  = read_tracker_val[i][read_tracker_rptr[i]];
       r_valid_active[i] = slave_rsp_i[i].r_valid && !read_tracker_empty[i][read_tracker_rptr[i]];
     end
@@ -196,9 +199,9 @@ module axi_lite_interconnect #(
   end
 
   // Route Read Responses back to Master 1
-  logic [7:0] m1_r_valids;
+  logic [9:0] m1_r_valids;
   always_comb begin
-    for (int i = 0; i < 8; i++) begin
+    for (int i = 0; i < 10; i++) begin
       m1_r_valids[i] = r_valid_active[i] && (active_master[i] == 1'b1);
     end
   end
@@ -218,7 +221,7 @@ module axi_lite_interconnect #(
     end else begin
       logic routed;
       routed = 1'b0;
-      for (int i = 2; i < 8; i++) begin
+      for (int i = 2; i < 10; i++) begin
         if (m1_r_valids[i] && !routed) begin
           master_rsp_o[1].r       = slave_rsp_i[i].r;
           master_rsp_o[1].r_valid = 1'b1;
@@ -231,7 +234,7 @@ module axi_lite_interconnect #(
   // Unified Request & Ready routing for all Slaves to avoid procedural multiple drivers
   always_comb begin
     // 1. Set default values for all slaves
-    for (int i = 0; i < 8; i++) begin
+    for (int i = 0; i < 10; i++) begin
       // Write Channel Defaults (Master 1 only)
       slave_req_o[i].aw       = master_req_i[1].aw;
       slave_req_o[i].aw_valid = 1'b0;
@@ -253,7 +256,7 @@ module axi_lite_interconnect #(
     end
 
     // 2. Enable write channels to the decoded slave
-    if (m1_aw_sel >= 0 && m1_aw_sel < 8) begin
+    if (m1_aw_sel >= 0 && m1_aw_sel < 10) begin
       slave_req_o[m1_aw_sel].aw_valid = master_req_i[1].aw_valid;
       slave_req_o[m1_aw_sel].w_valid  = master_req_i[1].w_valid;
       slave_req_o[m1_aw_sel].b_ready  = master_req_i[1].b_ready;
@@ -276,7 +279,7 @@ module axi_lite_interconnect #(
     end else begin
       logic routed;
       routed = 1'b0;
-      for (int i = 2; i < 8; i++) begin
+      for (int i = 2; i < 10; i++) begin
         if (m1_r_valids[i] && !routed) begin
           slave_req_o[i].r_ready = master_req_i[1].r_ready;
           routed                  = 1'b1;
