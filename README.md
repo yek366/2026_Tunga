@@ -7,34 +7,39 @@ TEKNOFEST 2026 Çip Tasarım Yarışması kapsamında geliştirilen açık kayna
 ```
 CV32E40P (RV32IMFC)
     │
-    ├─ OBI-AXI Bridge ×2 (buyruk / veri)
+    ├─ OBI → AXI köprü (buyruk / veri)
     │
-    └─ AXI Interconnect (5 master, 11 slave)
-         ├─ BootROM      (1 KB)
-         ├─ IMEM         (8 KB)
-         ├─ DMEM         (8 KB)
-         ├─ AI_MEM       (30 KB — NPU veri yolu)
+    └─ AXI-Lite Interconnect
+         ├─ Boot ROM
+         ├─ DATA SRAM
          ├─ GPIO, Timer, UART0, UART1, QSPI, I2C
-         └─ NPU CSR
+         ├─ Interrupt Controller
+         └─ NPU (CSR slave + AI_MEM master)
 ```
 
-**NPU:** TFLite Micro "Tiny Conv" INT8 — mikrofon sesini 4 sınıfa ayırır (yes / no / up / silence).  
-Veri yolu: `UART1 → AI_MEM (AXI-Stream) → NPU (DepthwiseConv2D + FC + Argmax)`
+**NPU:** TFLite Micro "Tiny Conv" INT8 — ses öznitelik vektörünü 4 sınıfa ayırır
+(silence / unknown / yes / no). Veri yolu: `AI_MEM → NPU (DepthwiseConv2D + FullyConnected + Argmax) → IRQ`.
+Quant aritmetiği gemmlowp referansıyla bit-exact.
 
 ## Dizin Yapısı
 
 ```
 rtl/          RTL kaynak dosyaları (SystemVerilog)
-  core/       cv32e40p alt modülü
+  core/       cv32e40p alt modülü (submodule)
   npu/        NPU bloğu
-  peripherals/  Çevre birim IP'leri
-tb/           Testbench'ler
-scripts/      Makefile ve derleme betikleri
+  bus/        OBI→AXI köprü + AXI-Lite interconnect
+  memory/     SRAM, AI_MEM
+  peripherals/  Çevre birim IP'leri (UART/GPIO/Timer/I2C/QSPI)
+  boot/       Boot ROM
+  top/        SoC üst modülü (soc_top)
+tb/           Testbench'ler (birim + sistem, self-checking)
+teknotest/    DDK eleme harness'i (gate)
+scripts/      Makefile + simülasyon betikleri
 docs/         Doğrulama planı ve teknik dökümanlar
-sw/           Gömülü yazılım (başlangıç kodu, BSP)
-vivado/       FPGA sentez projesi
+sw/           Gömülü yazılım
+vivado/       FPGA constraint + handoff
 openlane/     ASIC akışı
-draft/        Geliştirme taslakları
+draft/        Geliştirme taslakları + model üretim araçları
 weights/      .mem formatında model ağırlıkları (üretilen)
 ```
 
@@ -43,8 +48,14 @@ weights/      .mem formatında model ağırlıkları (üretilen)
 Gereksinim: **Verilator ≥ 5.036**
 
 ```bash
-# NPU birim testleri
-make -C scripts sim-npu
+# NPU tam doğrulama (golden + requant + self-checking TB)
+bash scripts/sim_npu.sh
+
+# NPU alt-sistem (npu_top + ai_mem, sistem bağlamı)
+bash scripts/sim_npu_subsystem.sh
+
+# Referans ses (yes/no/silence — TFLite ile birebir)
+bash scripts/sim_npu_subsystem_audio.sh
 
 # Lint
 make -C scripts lint-npu
@@ -52,19 +63,22 @@ make -C scripts lint-npu
 
 ## Hedef Teknoloji
 
-- **FPGA Prototipi:** Xilinx Artix-7 (XC7A100T)  
-- **ASIC Hedefi:** 130 nm (OpenLane / SkyWater 130)
+- **FPGA Prototipi:** Xilinx Artix-7 (Nexys 4)
+- **ASIC Hedefi:** OpenLane akışı
 
 ## Durum
 
 | Bileşen | Durum |
 |---------|-------|
-| NPU RTL | Geliştirme aşamasında |
-| Çevre birimler (GPIO/Timer/UART/QSPI/I2C) | Taslak |
-| OBI-AXI Bridge | Taslak |
-| AXI Interconnect | Taslak |
-| SoC üst modülü | Entegrasyon bekliyor |
-| Boot ROM | Taslak |
+| DDK teknotest gate (eleme) | ✅ Geçti |
+| NPU RTL | ✅ Doğrulandı (TFLite ile bit-exact, self-checking TB) |
+| CV32E40P çekirdek | ✅ Entegre |
+| OBI→AXI köprü + Interconnect | ✅ Çalışıyor |
+| Çevre birimler (UART/GPIO/Timer/QSPI/I2C) | 🟡 RTL hazır |
+| Boot ROM + SRAM | ✅ Hazır |
+| SoC üst modülü (soc_top) | 🟡 Entegre (tam-sistem doğrulama sürüyor) |
+| FPGA bitstream / sentez raporu | 🔴 Devam ediyor |
+| ASIC (OpenLane GDSII) | 🔴 Devam ediyor |
 
 ## Lisans
 
