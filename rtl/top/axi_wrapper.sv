@@ -24,9 +24,12 @@ module axi_wrapper #(
     output axi_req_t    rom_axi_req_o,
     input  axi_rsp_t    rom_axi_rsp_i,
 
-    // External Peripheral AXI-Lite Interfaces (Slaves 2 to 7)
-    output axi_req_t    uart_axi_req_o,
-    input  axi_rsp_t    uart_axi_rsp_i,
+    // External Peripheral AXI-Lite Interfaces (Slaves 2 to 9)
+    output axi_req_t    uart_stream_axi_req_o,
+    input  axi_rsp_t    uart_stream_axi_rsp_i,
+
+    output axi_req_t    uart_ctrl_axi_req_o,
+    input  axi_rsp_t    uart_ctrl_axi_rsp_i,
 
     output axi_req_t    gpio_axi_req_o,
     input  axi_rsp_t    gpio_axi_rsp_i,
@@ -41,7 +44,10 @@ module axi_wrapper #(
     input  axi_rsp_t    qspi_axi_rsp_i,
 
     output axi_req_t    npu_axi_req_o,
-    input  axi_rsp_t    npu_axi_rsp_i
+    input  axi_rsp_t    npu_axi_rsp_i,
+
+    output axi_req_t    intc_axi_req_o,
+    input  axi_rsp_t    intc_axi_rsp_i
 );
 
     // --- OBI INTERCONNECTION SIGNALS ---
@@ -68,8 +74,8 @@ module axi_wrapper #(
     axi_rsp_t [1:0] master_axi_rsp;
 
     // --- AXI SLAVE SIGNALS (Interconnect to Slaves) ---
-    axi_req_t [7:0] slave_axi_req;
-    axi_rsp_t [7:0] slave_axi_rsp;
+    axi_req_t [9:0] slave_axi_req;
+    axi_rsp_t [9:0] slave_axi_rsp;
 
     // --- 1. İŞLEMCİ ÇEKİRDEĞİ (CV32E40P) ---
     cv32e40p_top #(
@@ -164,7 +170,7 @@ module axi_wrapper #(
 
     // --- 5. INTERNAL SRAM MODULE (Slave 1) ---
     sram_module #(
-        .DepthBytes  ( 1048576 ), // 1 MB SRAM
+        .DepthBytes  ( 8192 ), // 8 KB SRAM
         .req_t       ( axi_req_t ),
         .rsp_t       ( axi_rsp_t )
     ) i_sram (
@@ -179,28 +185,36 @@ module axi_wrapper #(
     assign rom_axi_req_o    = slave_axi_req[0];
     assign slave_axi_rsp[0] = rom_axi_rsp_i;
 
-    // Slave 2: UART
-    assign uart_axi_req_o   = slave_axi_req[2];
-    assign slave_axi_rsp[2] = uart_axi_rsp_i;
+    // Slave 2: UART Stream
+    assign uart_stream_axi_req_o = slave_axi_req[2];
+    assign slave_axi_rsp[2]      = uart_stream_axi_rsp_i;
 
-    // Slave 3: GPIO
-    assign gpio_axi_req_o   = slave_axi_req[3];
-    assign slave_axi_rsp[3] = gpio_axi_rsp_i;
+    // Slave 3: UART Control
+    assign uart_ctrl_axi_req_o   = slave_axi_req[3];
+    assign slave_axi_rsp[3]      = uart_ctrl_axi_rsp_i;
 
-    // Slave 4: TIMER
-    assign timer_axi_req_o  = slave_axi_req[4];
-    assign slave_axi_rsp[4] = timer_axi_rsp_i;
+    // Slave 4: GPIO
+    assign gpio_axi_req_o   = slave_axi_req[4];
+    assign slave_axi_rsp[4] = gpio_axi_rsp_i;
 
-    // Slave 5: I2C
-    assign i2c_axi_req_o    = slave_axi_req[5];
-    assign slave_axi_rsp[5] = i2c_axi_rsp_i;
+    // Slave 5: TIMER
+    assign timer_axi_req_o  = slave_axi_req[5];
+    assign slave_axi_rsp[5] = timer_axi_rsp_i;
 
-    // Slave 6: QSPI
-    assign qspi_axi_req_o   = slave_axi_req[6];
-    assign slave_axi_rsp[6] = qspi_axi_rsp_i;
+    // Slave 6: I2C
+    assign i2c_axi_req_o    = slave_axi_req[6];
+    assign slave_axi_rsp[6] = i2c_axi_rsp_i;
 
-    // Slave 7: NPU
-    assign npu_axi_req_o    = slave_axi_req[7];
-    assign slave_axi_rsp[7] = npu_axi_rsp_i;
+    // Slave 7: QSPI
+    assign qspi_axi_req_o   = slave_axi_req[7];
+    assign slave_axi_rsp[7] = qspi_axi_rsp_i;
+
+    // Slave 8: NPU CSR
+    assign npu_axi_req_o    = slave_axi_req[8];
+    assign slave_axi_rsp[8] = npu_axi_rsp_i;
+
+    // Slave 9: INTC
+    assign intc_axi_req_o   = slave_axi_req[9];
+    assign slave_axi_rsp[9] = intc_axi_rsp_i;
 
 endmodule
