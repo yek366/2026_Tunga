@@ -1,9 +1,4 @@
-// =============================================================================
-// uart_peripheral.sv
-// TEKNOFEST 2026 Çip Tasarım Yarışması - Temel UART Çevre Birimi
-//
-// Şartname EK-2'de tanımlanan UART yazmaç haritasını uygular.
-// =============================================================================
+// Temel UART çevre birimi (şartname EK-2 yazmaç haritası)
 
 module uart_peripheral #(
     // Sistem saat frekansı (varsayılan 50 MHz)

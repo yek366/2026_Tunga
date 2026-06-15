@@ -1,15 +1,4 @@
-// ============================================================================
-//  i2c_peripheral_tb.sv – Testbench for I2C Master Peripheral
-// ============================================================================
-//  Tests:
-//    1. Register read/write and NBY clamping
-//    2. Single-byte TX with slave ACK
-//    3. Multi-byte TX (3 bytes)
-//    4. Single-byte RX
-//    5. Multi-byte RX (4 bytes)
-//    6. NACK on address (wrong slave)
-//    7. Race-condition guard (TX+RX simultaneous → TX wins)
-// ============================================================================
+// Testbench for the I2C master peripheral
 
 `timescale 1ns / 1ps
 

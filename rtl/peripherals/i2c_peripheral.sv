@@ -1,16 +1,4 @@
-//    - AXI4-Lite Slave for CPU register access (8-bit addr, 32-bit data)
-//    - I2C Master with open-drain SDA/SCL
-//    - Parameterised system clock (default 48 MHz) and I2C frequency (400 kHz)
-//    - Hardware race-condition protection (TX/RX mutual exclusion)
-//    - Single always_ff for all registers + FSM (no multiple-driver issues)
-//    - HW Interrupt generation on TX_DONE or RX_DONE
-//
-//  Register Map:
-//    0x00  I2C_NBY  [RW]  Number of bytes to transfer (1..4, clamped)
-//    0x04  I2C_ADR  [RW]  7-bit slave address in [6:0]
-//    0x08  I2C_RDR  [RO]  Read data (1-4 bytes, LSB-first packing)
-//    0x0C  I2C_TDR  [RW]  Transmit data (1-4 bytes, LSB-first packing)
-//    0x10  I2C_CFG  [RW]  [0] TX_EN  [1] TX_DONE  [2] RX_EN  [3] RX_DONE
+// I2C master peripheral with AXI4-Lite slave register interface
 
 module i2c_peripheral #(
     parameter int SYS_CLK_FREQ = 48_000_000,   // System clock in Hz

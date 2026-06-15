@@ -1,8 +1,5 @@
 `timescale 1ns / 1ps
-// ==============================================================================
-//  axi_lite_interconnect.sv
-//  2-Master, 8-Slave AXI-Lite Interconnect Module
-// ==============================================================================
+// 2-Master, 8-Slave AXI-Lite interconnect
 
 import axi_pkg::*;
 import memory_map_pkg::*;

@@ -1,13 +1,3 @@
-// ============================================================
-// Module : local_buffer
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Desc   : NPU yerel SRAM tamponu — DepthwiseConv2D çıkışı (4000 × INT8),
-//          FullyConnected girişi. Tek yazma (DW), tek okuma (FC) portu.
-//          KAYITLI okuma (synchronous-read RAM) → FPGA/ASIC BRAM eşlenir.
-//          rd_data, rd_addr'den 1 çevrim sonra geçerli (tüketici pipeline'lı).
-// ============================================================
-
 `timescale 1ns/1ps
 
 module local_buffer #(

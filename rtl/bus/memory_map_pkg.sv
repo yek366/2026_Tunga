@@ -1,8 +1,5 @@
 `timescale 1ns / 1ps
-// ==============================================================================
-//  memory_map_pkg.sv
-//  Tunga SoC Memory Map Definition
-// ==============================================================================
+// Tunga SoC memory map
 
 package memory_map_pkg;
 

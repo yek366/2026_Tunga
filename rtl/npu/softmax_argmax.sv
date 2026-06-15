@@ -1,14 +1,3 @@
-// ============================================================
-// Module : softmax_argmax
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Date   : 2026-05-03
-// Desc   : Karar birimi — 4 adet INT32 logit arasından Argmax hesaplar.
-//          Tam Softmax donanımda pahalıdır; şartname yalnızca argmax
-//          (en büyük değerin indeksi) ile karar vermesine izin verir.
-//          Çıkış: 2-bit sınıf indeksi (0=silence, 1=unknown, 2=yes, 3=no)
-// ============================================================
-
 `timescale 1ns/1ps
 
 module softmax_argmax #(

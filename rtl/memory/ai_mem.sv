@@ -1,28 +1,3 @@
-// ============================================================
-// Module : ai_mem
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Date   : 2026-06-15
-// Desc   : AI_MEM — NPU'nun AXI4 master'ının agirlik blob'u + giris
-//          oznitelik vektorunu okudugu on-chip bellek. TAM AXI4 slave
-//          (okuma + yazma). Tek-outstanding, tek-beat, 1 cyc gecikme.
-//
-//          OKUMA: NPU master (arsize=0 byte, arlen=0) okur. Istenen bayt
-//          AXI4-uyumlu sekilde adres lane'ine (8*addr[1:0]) yerlestirilir
-//          → standart 32-bit master da dogru baytı alir (lane-aligned).
-//          YAZMA: AW/W/B kanallari aktif (wstrb bayt-enable). FPGA'da
-//          AI_MEM'i UART1 stream / CPU / DMA doldurabilsin diye. wstrb ile
-//          bayt-bazli yazma.
-//
-//          ARALIK KONTROLU: araddr/awaddr [BASE, BASE+SIZE) disindaysa
-//          OOB erisim YOK (indeks 0'a kelepcelenir) ve rresp/bresp = SLVERR
-//          (2'b10) doner — sessiz cop/tasma engellenir.
-//
-//          Sentez: senkron-okuma (rdata kayitli) + bayt-enable yazma →
-//          FPGA/ASIC BRAM/SRAM (simple-dual-port) inference. INIT_FILE ile
-//          $readmemh onyukleme (BRAM init) veya TB hiyerarsik yukleme.
-// ============================================================
-
 `timescale 1ns/1ps
 
 module ai_mem #(
@@ -84,7 +59,6 @@ module ai_mem #(
     end
 
     // ================= OKUMA =================
-    // Adres -> ofset (taban cikar) + aralik kontrolu (tasma & alt-tasma)
     logic [ADDR_WIDTH-1:0] ar_off;
     logic                  ar_in_range;
     logic [IDXW-1:0]       ar_idx;
@@ -109,7 +83,6 @@ module ai_mem #(
             rresp_q  <= RESP_OKAY;
         end else begin
             if (s_axi_arvalid && s_axi_arready) begin
-                // Bayt, AXI4-uyumlu adres lane'ine (8*addr[1:0]) yerlesir
                 rdata_q  <= ({{(DATA_WIDTH-8){1'b0}}, mem[ar_idx]}) << (8*ar_lane);
                 rid_q    <= s_axi_arid;
                 rresp_q  <= ar_in_range ? RESP_OKAY : RESP_SLVERR;
@@ -127,7 +100,6 @@ module ai_mem #(
     assign s_axi_rlast  = 1'b1;    // tek-beat (arlen=0)
 
     // ================= YAZMA =================
-    // AW + W birlikte kabul (tek-beat); wstrb bayt-enable; aralik kontrollu.
     logic [ADDR_WIDTH-1:0] aw_off;
     logic                  aw_in_range;
     assign aw_off      = s_axi_awaddr - BASE_ADDR;
@@ -148,7 +120,6 @@ module ai_mem #(
             bid_q    <= '0;
         end else begin
             if (s_axi_awvalid && s_axi_wvalid && s_axi_awready && s_axi_wready) begin
-                // Bayt-bazli yazma (yalniz aralik icindeki baytlar)
                 for (j = 0; j < 4; j++) begin
                     if (s_axi_wstrb[j] && ((aw_off + j[ADDR_WIDTH-1:0]) < SIZE_BYTES[ADDR_WIDTH-1:0]))
                         mem[(aw_off + j[ADDR_WIDTH-1:0]) >> 0] <= s_axi_wdata[8*j +: 8];

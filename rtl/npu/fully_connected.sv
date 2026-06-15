@@ -1,18 +1,3 @@
-// ============================================================
-// Module : fully_connected
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Desc   : FullyConnected (Dense) — INT8 MAC → per-channel requant → INT8 logit.
-//          4 nöron × 4000 giriş. Giriş = DW çıkışı (flatten, INT8).
-//            acc[n] = Σ w[n][i] * (in[i] - fc_input_zp) + bias[n]
-//            logit[n] = requant(acc[n], mult[n], shift[n]) + fc_out_zp  (INT8)
-//          Gerçek tiny_conv FC'si PER-CHANNEL quantize (4 ayrı ölçek);
-//          argmax requant'lı int8 logit üzerinde (TFLite sınıfıyla aynı).
-//
-//          BORU HATTI: local_buffer + fc_weight_buffer KAYITLI okuma (BRAM);
-//          adres MAC'ten 1 çevrim önde, çarpım gecikmeli biriktirilir.
-// ============================================================
-
 `timescale 1ns/1ps
 
 module fully_connected

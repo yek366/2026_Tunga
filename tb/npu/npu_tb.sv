@@ -1,19 +1,3 @@
-// ============================================================
-// Module : npu_tb
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Date   : 2026-06-14
-// Desc   : NPU izole SELF-CHECKING testbench'i (golden referansa karşı).
-//          - AI_MEM AXI4 slave BFM (NPU master okumalarına handshake yanıtı)
-//          - Golden blob ($readmemh): weights/npu_weights.mem + npu_input.mem
-//          - CSR ile WEIGHT/INPUT adres + START; IRQ bekle; NPU_RESULT oku
-//          - Sınıf, golden beklenen sınıfla (npu_expected_class.txt) karşılaştırılır
-//          - DERİN kontrol: DW çıkışı (local_buffer) golden npu_dwout.mem ile
-//            bit-bit karşılaştırılır → quant/conv hattı doğrulanır
-//          Vektörler: python3 draft/ali_salih/npu_golden.py --emit
-//          Çalıştırma: repo kökünden (weights/ göreli yol)
-// ============================================================
-
 `timescale 1ns/1ps
 
 module npu_tb
@@ -77,9 +61,7 @@ module npu_tb
         .npu_irq(npu_irq)
     );
 
-    // ========================================================
     // AI_MEM AXI4 slave BFM (tek-outstanding, 1 cyc gecikme)
-    // ========================================================
     localparam int AI_MEM_WORDS = 32768;
     logic [7:0] ai_mem [0:AI_MEM_WORDS-1];
 
@@ -114,9 +96,7 @@ module npu_tb
     assign m_axi_bresp   = 2'b00;
     assign m_axi_bid     = '0;
 
-    // ========================================================
     // AXI4-Lite CSR sürücüleri
-    // ========================================================
     initial begin
         s_axil_awvalid = 0; s_axil_awaddr = '0;
         s_axil_wvalid  = 0; s_axil_wdata = '0; s_axil_wstrb = 4'hF;
@@ -125,10 +105,7 @@ module npu_tb
         s_axil_rready  = 1;
     end
 
-    // ========================================================
-    // SVA — protokol kontrolleri (şartname §4 "Protokol Kontrolleri")
-    // AXI handshake kararlılığı + NPU invariantları. Verilator --assert ile.
-    // ========================================================
+    // SVA — protokol kontrolleri (şartname §4)
     default disable iff (!rst_n);
 
     // Gözlem: NPU iç durum (assertion için hiyerarşik)
@@ -173,9 +150,7 @@ module npu_tb
         if (s_axil_rresp !== 2'b00) $error("[AXIL] okuma resp=%b @0x%02X", s_axil_rresp, addr);
     endtask
 
-    // ========================================================
     // Golden referans verileri
-    // ========================================================
     logic [7:0]         exp_dwout [0:FC_FLAT-1];     // golden DW çıkışı
     logic signed [7:0]  exp_logits [0:FC_OUTPUTS-1]; // golden FC logit'leri (INT8)
     integer             exp_class;

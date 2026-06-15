@@ -1,11 +1,4 @@
-// =============================================================================
-// uart_stream_peripheral.sv
-// TEKNOFEST 2026 Çip Tasarım Yarışması - UART Stream Çevre Birimi (Gömülü DMA Sürümü)
-//
-// Çift Arayüz: 
-//   - AXI4-Lite Slave  : CPU konfigürasyonu ve yazmaç erişimi
-//   - AXI4-Lite Master : Gelen verileri doğrudan YZ Belleğine (SRAM) yazma
-// =============================================================================
+// UART stream çevre birimi (gömülü DMA): AXI4-Lite slave (CPU) + master (SRAM yazma)
 
 module uart_stream_peripheral #(
     parameter int SYS_CLK_HZ    = 50_000_000,

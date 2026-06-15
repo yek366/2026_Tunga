@@ -1,10 +1,7 @@
 `timescale 1ns / 1ps
 
-/*
- * Modül: boot_rom
- * Açıklama: AXI4-Lite read-only arayüzüne sahip 1KB Senkron Boot ROM.
- * Hedef: Mikroişlemcinin boot komutlarını sağlamak.
- */
+// AXI4-Lite read-only 1KB senkron boot ROM
+
 module boot_rom(
     input logic clk,
     input logic rst_n,
@@ -24,17 +21,14 @@ module boot_rom(
     // 1KB Kapasite
     logic [31:0] mem [0:255];
 
-    // SİHİRLİ DOKUNUŞ: Teknofest'in test kodunu (helloworld.mem) ROM'a göm.
+    // Test kodunu (helloworld.mem) ROM'a yükle
     initial begin
         $readmemh("helloworld.mem", mem);
     end
 
-    // Pipelined AXI4-Lite Okuma Kontrol Mantığı:
-    // ROM, eğer elinde geçerli bir veri yoksa (rvalid = 0) VEYA işlemci bu cycle veriyi alıyorsa (rready = 1)
-    // yeni adres almaya hazırdır (arready = 1). Bu sayede 1 cycle aralıkla ardışık okuma yapılabilir.
+    // ROM, veri tutmuyorsa veya işlemci bu cycle veriyi alıyorsa yeni adres alabilir
     assign s_axi_arready = !s_axi_rvalid || s_axi_rready;
 
-    // Basitleştirilmiş ve Kusursuz Okuma FSM'i
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             s_axi_rvalid <= 1'b0;

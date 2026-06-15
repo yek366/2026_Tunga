@@ -1,23 +1,3 @@
-// ============================================================
-// Module : npu_subsystem
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Date   : 2026-06-15
-// Desc   : NPU alt-sistemi — npu_top + ai_mem'i AXI4 üzerinden birleştirir.
-//          NPU AXI4 master → AI_MEM AXI4 slave (ağırlık+giriş okuması) hattı
-//          ALT-SİSTEM İÇİNDE kapalıdır. Dışarıya yalnız iki sistem arayüzü:
-//            (1) AXI4-Lite CSR slave  → CPU/interconnect buradan tetikler/okur
-//            (2) npu_irq              → CPU kesme girişine
-//
-//          Böylece NPU, Sevda'nın bus altyapısı (köprü+interconnect) hazır
-//          olmadan da SİSTEM bağlamında doğrulanır: CSR slave ileride
-//          interconnect slave-7'ye, AI_MEM ise bus'a taşınabilir (master
-//          portu zaten mevcut). Bu sarmalayıcı entegrasyon yüzeyini sabitler.
-//
-//          AI_MEM önyükleme: TB hiyerarşik $readmemh ile u_aimem.mem yükler,
-//          veya AIMEM_INIT parametresiyle dosyadan ($readmemh, BRAM init).
-// ============================================================
-
 `timescale 1ns/1ps
 
 module npu_subsystem
@@ -81,9 +61,7 @@ module npu_subsystem
     logic [1:0]                axi_rresp;
     logic                      axi_rlast, axi_rvalid, axi_rready;
 
-    // ========================================================
     // NPU çekirdeği (CSR slave dışarı, AXI4 master içeri)
-    // ========================================================
     npu_top #(
         .AXI_ADDR_WIDTH(AXI_ADDR_WIDTH), .AXI_DATA_WIDTH(AXI_DATA_WIDTH),
         .AXI_ID_WIDTH(AXI_ID_WIDTH), .CSR_ADDR_WIDTH(CSR_ADDR_WIDTH)
@@ -107,9 +85,7 @@ module npu_subsystem
         .npu_irq(npu_irq)
     );
 
-    // ========================================================
     // AI_MEM (AXI4 salt-okunur slave)
-    // ========================================================
     ai_mem #(
         .ADDR_WIDTH(AXI_ADDR_WIDTH), .DATA_WIDTH(AXI_DATA_WIDTH), .ID_WIDTH(AXI_ID_WIDTH),
         .BASE_ADDR(AIMEM_BASE), .SIZE_BYTES(AIMEM_SIZE), .INIT_FILE(AIMEM_INIT)

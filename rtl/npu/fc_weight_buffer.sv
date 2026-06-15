@@ -1,13 +1,3 @@
-// ============================================================
-// Module : fc_weight_buffer
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Desc   : FullyConnected ağırlık on-chip tamponu.
-//          16000 × INT8 = 4 nöron × 4000 giriş, [neuron][input] flat.
-//          Loader yazma portu + FC kombinasyonel okuma portu.
-//          (Çip akışı notu: bkz. input_buffer — BRAM eşlemesinde kayıtlı okuma.)
-// ============================================================
-
 `timescale 1ns/1ps
 
 module fc_weight_buffer

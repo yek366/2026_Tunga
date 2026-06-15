@@ -1,14 +1,3 @@
-// ============================================================
-// Module : requant_tb
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Desc   : quant_requant (gemmlowp INT8 requant) birim testbench'i.
-//          weights/requant_vectors.txt golden vektörlerini okur,
-//          her satırı DUT'a uygular, beklenen INT8 çıkışla karşılaştırır.
-//          Tek bir uyuşmazlık → FAIL. Bit-exact golden eşleşmesi şart.
-// Üretim : python3 draft/ali_salih/npu_golden.py --requant-vectors
-// ============================================================
-
 `timescale 1ns/1ps
 
 module requant_tb;

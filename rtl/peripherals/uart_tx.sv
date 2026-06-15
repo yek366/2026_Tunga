@@ -1,13 +1,4 @@
-// =============================================================================
-// uart_tx.sv
-// TEKNOFEST 2026 Çip Tasarım Yarışması - UART Verici Modülü
-//
-// Özellikler:
-//   - Programlanabilir baud hızı (sistem_saati / CPB)
-//   - 8 bit veri, LSB önce
-//   - 1 / 1.5 / 2 stop bit desteği (şartname EK-2)
-//   - 1 start bit
-// =============================================================================
+// UART verici: programlanabilir baud, 8 bit veri LSB önce, 1/1.5/2 stop bit
 
 module uart_tx
     import uart_pkg::*;

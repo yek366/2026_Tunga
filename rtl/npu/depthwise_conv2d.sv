@@ -1,18 +1,3 @@
-// ============================================================
-// Module : depthwise_conv2d
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Desc   : DepthwiseConv2D + per-channel requant + fused ReLU (INT8).
-//          Giriş 49×40×1, kernel 8×(10×8), stride 2, SAME padding,
-//          depth_multiplier=8 → çıkış 25×20×8 (4000 INT8).
-//          TFLite Micro referans çekirdeğiyle BIT-EXACT (npu_pkg requant).
-//
-//          BORU HATTI: on-chip tamponlar KAYITLI okuma (BRAM). Adres üretimi
-//          MAC'ten 1 çevrim önde gider; her çevrim bir önceki tap'in ağırlık×
-//          piksel çarpımı biriktirilir (1 MAC/çevrim, pencere başına 1 çevrim
-//          dolum). Padding geçerlilik bayrağı (vld_q) veriyle hizalı tutulur.
-// ============================================================
-
 `timescale 1ns/1ps
 
 module depthwise_conv2d

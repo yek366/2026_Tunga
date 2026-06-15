@@ -1,18 +1,4 @@
-// =============================================================================
-// uart_rx.sv
-// TEKNOFEST 2026 Çip Tasarım Yarışması - UART Alıcı Modülü
-//
-// Özellikler:
-//   - Başlangıç biti ortasından örnekleme (gürültü toleransı)
-//   - 8 bit veri, LSB önce
-//   - Programlanabilir baud hızı
-//   - Yanlış başlangıç biti tespiti
-// =============================================================================
-// =============================================================================
-// uart_pkg.sv
-// TEKNOFEST 2026 Çip Tasarım Yarışması - UART Çevre Birimi Paketi
-// Ortak parametre ve tip tanımları
-// =============================================================================
+// UART alıcı: başlangıç biti ortasından örnekleme, 8 bit LSB önce, çerçeve hata tespiti
 
 package uart_pkg;
 

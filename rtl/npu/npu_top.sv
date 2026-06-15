@@ -1,15 +1,3 @@
-// ============================================================
-// Module : npu_top
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Date   : 2026-06-14
-// Desc   : NPU üst modülü — TFLite Micro Speech "Tiny Conv" INT8 çıkarım
-//          motoru. AXI4-Lite CSR slave + AXI4 master (AI_MEM) + IRQ.
-//          Hat: loader(blob+giriş) → DepthwiseConv2D(+requant+ReLU) →
-//               FullyConnected(int32 logit) → Argmax → IRQ.
-//          Quant aritmetiği TFLite referansıyla bit-exact (npu_pkg).
-// ============================================================
-
 `timescale 1ns/1ps
 
 module npu_top
@@ -131,9 +119,7 @@ module npu_top
     logic signed [7:0]                  fc_logits [0:FC_OUTPUTS-1];  // per-channel requant sonrası INT8
     logic                               fc_logits_valid;
 
-    // ========================================================
     // AXI denetleyici (CSR slave + okuma motoru)
-    // ========================================================
     axi_controller #(
         .AXI_ADDR_WIDTH(AXI_ADDR_WIDTH), .AXI_DATA_WIDTH(AXI_DATA_WIDTH),
         .AXI_ID_WIDTH(AXI_ID_WIDTH), .CSR_ADDR_WIDTH(CSR_ADDR_WIDTH)
@@ -158,9 +144,7 @@ module npu_top
         .rd_byte(rd_byte), .rd_valid(rd_valid), .rd_busy(rd_busy), .rd_done(rd_done)
     );
 
-    // ========================================================
     // Kontrol FSM + loader
-    // ========================================================
     fsm_controller u_fsm (
         .clk(clk), .rst_n(rst_n),
         .start(csr_start), .input_base_addr(csr_input_addr), .weight_base_addr(csr_weight_addr),
@@ -178,9 +162,7 @@ module npu_top
         .busy(fsm_busy), .done(fsm_done), .result(argmax_result), .irq(npu_irq)
     );
 
-    // ========================================================
     // On-chip tamponlar
-    // ========================================================
     input_buffer u_ibuf (
         .clk(clk),
         .in_wr_en(in_wr_en), .in_wr_addr(in_wr_addr), .in_wr_data(in_wr_data),
@@ -201,9 +183,7 @@ module npu_top
         .rd_addr(fc_in_rd_addr), .rd_data(fc_in_rd_data)
     );
 
-    // ========================================================
     // Hesaplama katmanları
-    // ========================================================
     depthwise_conv2d u_dw (
         .clk(clk), .rst_n(rst_n), .start(dw_start), .done(dw_done),
         .input_zp(input_zp), .out_zp(dw_out_zp), .act_min(dw_act_min), .act_max(dw_act_max),

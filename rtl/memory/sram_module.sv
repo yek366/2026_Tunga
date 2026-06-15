@@ -1,8 +1,5 @@
 `timescale 1ns / 1ps
-// ==============================================================================
-//  sram_module.sv
-//  AXI-Lite Synchronous SRAM Controller
-// ==============================================================================
+// AXI-Lite synchronous SRAM controller
 
 import axi_pkg::*;
 

@@ -1,21 +1,3 @@
-// ============================================================
-// Module : fsm_controller
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Desc   : NPU ana kontrol FSM'i + ağırlık/giriş yükleyici (loader).
-//          1) Ağırlık blob'unu AI_MEM'den (weight_base) okur, AI_MEM
-//             yerleşimine göre dağıtır:
-//               header (zp/act) → quant register'ları
-//               dw_mult/shift/bias[8] (int32, little-endian) → register'lar
-//               dw_weight[640]   → input_buffer (DW ağırlık portu)
-//               fc_bias[4]       → register'lar
-//               fc_weight[16000] → fc_weight_buffer
-//          2) Giriş[1960]'ı AI_MEM'den (input_base) okur → input_buffer.
-//          3) DepthwiseConv → FullyConnected → Argmax sıralar.
-//          4) Sonucu mandallar, DONE'da CPU'ya IRQ üretir.
-//          Quant parametreleri DW/FC modüllerine register dizisi olarak çıkar.
-// ============================================================
-
 `timescale 1ns/1ps
 
 module fsm_controller
@@ -109,9 +91,7 @@ module fsm_controller
         return {{24{b[7]}}, b};
     endfunction
 
-    // ============================================================
-    // Yükleme dağıtımı — buffer yazmaları KOMBİNASYONEL (rd_valid + load_cnt)
-    // ============================================================
+    // Yükleme dağıtımı — buffer yazmaları kombinasyonel (rd_valid + load_cnt)
     logic in_w_phase;   // ağırlık yükleme fazı
     logic in_i_phase;   // giriş yükleme fazı
     assign in_w_phase = (state == S_LDW_DATA);
@@ -146,9 +126,7 @@ module fsm_controller
     assign fcbias_li  = 4'(load_cnt - C_FC_BIAS);
     assign fcoutzp_li = 2'(load_cnt - C_FC_OUTZP);
 
-    // ============================================================
     // Ana FSM
-    // ============================================================
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             state        <= S_IDLE;

@@ -1,8 +1,4 @@
-// =============================================================================
-// uart_pkg.sv
-// TEKNOFEST 2026 Çip Tasarım Yarışması - UART Çevre Birimi Paketi
-// Ortak parametre ve tip tanımları
-// =============================================================================
+// UART çevre birimi paketi: ortak parametre ve tip tanımları
 
 package uart_pkg;
 

@@ -1,15 +1,3 @@
-// ============================================================
-// Module : ai_mem_tb
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Date   : 2026-06-15
-// Desc   : ai_mem birim self-checking TB (denetim bulgulari icin).
-//          Kapsam: yazma yolu (AW/W/B + wstrb) + geri-okuma, lane hizalama
-//          (8*addr[1:0]), aralik kontrolu — OOB (BASE+SIZE) ve alt-tasma
-//          (BASE-4) erisiminde rresp/bresp = SLVERR (2'b10).
-//          Calistirma: verilator --binary --assert, repo kokunden.
-// ============================================================
-
 `timescale 1ns/1ps
 
 module ai_mem_tb;

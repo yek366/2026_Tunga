@@ -33,9 +33,7 @@ module timer_peripheral # (
     output logic                          s_axi_rvalid,
     input  logic                          s_axi_rready,
 
-    // =========================================================================
-    // --- DONANIMSAL KESME (INTERRUPT) ÇIKIŞI ---
-    // =========================================================================
+    // Donanımsal kesme çıkışı
     output logic                          timer_irq
 );
 

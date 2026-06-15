@@ -1,17 +1,3 @@
-// ============================================================
-// Module : axi_controller
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Desc   : NPU AXI denetleyicisi.
-//          - AXI4-Lite slave (CSR): CPU'dan NPU_CTRL/STATUS/INPUT_ADDR/
-//            WEIGHT_ADDR/RESULT erişimi.
-//          - AXI4 master okuma motoru: AI_MEM'den bayt akışı (tek-beat,
-//            tam AR/R handshake). FSM'e (rd_byte, rd_valid, rd_done) sunar.
-//          NOT: tek-beat (AxLEN=0) doğru ama yavaş; INCR burst sonraki
-//          optimizasyon (rd_len zaten beat sayısını taşıyor).
-//          Yazma kanalı kullanılmaz (sonuç CSR'dan okunur) → boşta.
-// ============================================================
-
 `timescale 1ns/1ps
 
 module axi_controller #(
@@ -93,9 +79,7 @@ module axi_controller #(
     output logic        rd_done             // tüm beat'ler tamam (puls)
 );
 
-    // ========================================================
     // CSR adres sabitleri
-    // ========================================================
     localparam logic [CSR_ADDR_WIDTH-1:0] NPU_CTRL_ADDR       = 8'h00;
     localparam logic [CSR_ADDR_WIDTH-1:0] NPU_STATUS_ADDR     = 8'h04;
     localparam logic [CSR_ADDR_WIDTH-1:0] NPU_INPUT_ADDR_REG  = 8'h08;
@@ -111,9 +95,6 @@ module axi_controller #(
     assign csr_weight_addr = reg_weight_addr;
 
     // ---- AXI4-Lite YAZMA kanalı (combinational ready) ----
-    // Master aw+w'yi birlikte sunar (CV32E40P köprüsü / TB). ready'ler idle'da
-    // KOMBİNASYONEL yüksek → back-to-back transferlerde "registered ready 0'a
-    // ezilme" hatası yok; master ready=1'i aynı çevrimde gözlemler.
     typedef enum logic [0:0] {W_IDLE, W_RESP} axil_wr_state_t;
     axil_wr_state_t wr_state;
 
@@ -193,9 +174,7 @@ module axi_controller #(
         end
     end
 
-    // ========================================================
     // AXI4 Master okuma motoru (tek-beat, tam handshake)
-    // ========================================================
     typedef enum logic [1:0] {M_IDLE, M_AR, M_DATA} rd_eng_state_t;
     rd_eng_state_t r_state;
 
@@ -242,8 +221,7 @@ module axi_controller #(
 
     assign rd_busy  = (r_state != M_IDLE);
     assign rd_valid = (r_state == M_DATA) && m_axi_rvalid;
-    // AXI4-uyumlu: bayt, adres lane'inde (8*addr[1:0]) gelir → dogru lane'den al.
-    // arsize=0 dar transfer; lane = araddr[1:0] (asagidaki AR ile ayni ifade).
+    // Bayt, adres lane'inden (8*addr[1:0]) alinir
     logic [31:0] rd_cur_addr;
     logic [1:0]  rd_lane;
     assign rd_cur_addr = r_base + {15'h0, r_cnt};   // m_axi_araddr ile ayni

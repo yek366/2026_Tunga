@@ -1,21 +1,3 @@
-// ============================================================
-// Module : npu_subsystem_tb
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Date   : 2026-06-15
-// Desc   : NPU ALT-SİSTEM sistem-seviye self-checking testbench'i.
-//          npu_subsystem = npu_top + ai_mem (gerçek AXI4 bellek modülü).
-//          npu_tb'den FARKI: AXI4 slave artık inline BFM değil, gerçek
-//          ai_mem.sv modülü; NPU master onu GERÇEK AXI4 üzerinden okur →
-//          sistem bağlamında uçtan-uca doğrulama (CPU davranışı: CSR yaz →
-//          START → IRQ bekle → RESULT oku → self-check).
-//
-//          Önyükleme: AI_MEM'e ağırlık blob (taban+0) + giriş (taban+0x4400)
-//          hiyerarşik $readmemh ile yüklenir. Golden:
-//             python3 draft/ali_salih/npu_golden.py --emit
-//          Çalıştırma: repo kökünden (weights/ göreli yol).
-// ============================================================
-
 `timescale 1ns/1ps
 
 module npu_subsystem_tb
@@ -74,9 +56,7 @@ module npu_subsystem_tb
         s_axil_rready  = 1;
     end
 
-    // ========================================================
     // SVA — sistem protokol kontrolleri (şartname §4)
-    // ========================================================
     default disable iff (!rst_n);
 
     // NPU iç durum (busy/done) + iç AXI4 master hattı (subsystem içi)
@@ -114,9 +94,7 @@ module npu_subsystem_tb
     // BUSY ve DONE aynı anda olamaz
     a_busy_done: assert property (@(posedge clk) !(fsm_busy_w && fsm_done_w));
 
-    // ========================================================
     // CSR erişim task'ları (negedge'de sür)
-    // ========================================================
     task automatic axil_write(input logic [7:0] addr, input logic [31:0] data);
         @(negedge clk);
         s_axil_awaddr = addr; s_axil_awvalid = 1;
@@ -137,9 +115,7 @@ module npu_subsystem_tb
         if (s_axil_rresp !== 2'b00) $error("[AXIL] okuma resp=%b @0x%02X", s_axil_rresp, addr);
     endtask
 
-    // ========================================================
     // Golden referans verileri
-    // ========================================================
     logic [7:0]         exp_dwout  [0:FC_FLAT-1];
     logic signed [7:0]  exp_logits [0:FC_OUTPUTS-1];
     integer             exp_class;

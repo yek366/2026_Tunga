@@ -1,12 +1,3 @@
-// ============================================================
-// Module : quant_requant
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Desc   : npu_pkg::requant_relu kombinasyonel sarmalayıcısı.
-//          DW katmanı akümülatör → INT8 requant + zero-point + fused ReLU.
-//          Birim test (requant_tb) ile golden'a karşı doğrulanır.
-// ============================================================
-
 `timescale 1ns/1ps
 
 module quant_requant

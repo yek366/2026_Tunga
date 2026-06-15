@@ -1,17 +1,3 @@
-// ============================================================
-// Package: npu_pkg
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Desc   : NPU ortak sabitleri + gemmlowp INT8 requantization
-//          fonksiyonları. RTL ve Python golden (npu_golden.py) BİREBİR
-//          aynı integer aritmetiğini uygular.
-//          - sat_round_doubling_high_mul (gemmlowp SRDHM)
-//          - rounding_divide_by_pot       (gemmlowp RDBP)
-//          - multiply_by_quantized_multiplier (TFLite requant)
-//          - requant_relu  (DW katmanı: requant + zero-point + fused ReLU clamp)
-//          Model: TFLite Micro Speech "Tiny Conv" INT8.
-// ============================================================
-
 `ifndef NPU_PKG_SV
 `define NPU_PKG_SV
 
@@ -58,10 +44,7 @@ package npu_pkg;
     localparam logic signed [31:0] INT32_MAX = 32'sh7FFF_FFFF;
     localparam logic signed [31:0] INT32_MIN = 32'sh8000_0000;
 
-    // ============================================================
     // gemmlowp SaturatingRoundingDoublingHighMul
-    //   (2*a*b)'nin yüksek 32 biti, yuvarlamalı; INT32_MIN² → INT32_MAX
-    // ============================================================
     function automatic logic signed [31:0] srdhm(
         input logic signed [31:0] a,
         input logic signed [31:0] b
@@ -81,9 +64,7 @@ package npu_pkg;
         end
     endfunction
 
-    // ============================================================
-    // gemmlowp RoundingDivideByPOT — yuvarlamalı 2^exp bölme (aritmetik)
-    // ============================================================
+    // gemmlowp RoundingDivideByPOT
     function automatic logic signed [31:0] rdbp(
         input logic signed [31:0] x,
         input logic        [5:0]  exponent
@@ -98,10 +79,7 @@ package npu_pkg;
         end
     endfunction
 
-    // ============================================================
     // TFLite MultiplyByQuantizedMultiplier
-    //   shift>0 → sola, shift<=0 → sağa kaydırma
-    // ============================================================
     function automatic logic signed [31:0] mbqm(
         input logic signed [31:0] x,
         input logic signed [31:0] mult,
@@ -121,9 +99,7 @@ package npu_pkg;
         end
     endfunction
 
-    // ============================================================
-    // DW katmanı çıkış requant'i: requant + output_zp + fused ReLU clamp → int8
-    // ============================================================
+    // DW requant + output_zp + fused ReLU clamp → int8
     function automatic logic signed [7:0] requant_relu(
         input logic signed [31:0] acc,
         input logic signed [31:0] mult,

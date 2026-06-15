@@ -1,10 +1,4 @@
-// =============================================================================
-// sync_fifo.sv
-// TEKNOFEST 2026 Çip Tasarım Yarışması - Senkron FIFO
-//
-// Parametreli, senkron, ilk giren ilk çıkar bellek yapısı.
-// UART Stream alıcı tampon belleği olarak kullanılır.
-// =============================================================================
+// Parametreli senkron FIFO (UART Stream alıcı tamponu)
 
 module sync_fifo #(
     parameter int DATA_W = 8,             // Bit cinsinden veri genişliği

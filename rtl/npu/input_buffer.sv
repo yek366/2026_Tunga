@@ -1,18 +1,3 @@
-// ============================================================
-// Module : input_buffer
-// Project: TUNGA SoC — TEKNOFEST 2026
-// Author : Ali Salih Yıldırım
-// Desc   : NPU giriş + DepthwiseConv ağırlık on-chip tamponu.
-//          - input_mem : 1960 × INT8 (49×40×1 giriş spektrogramı, flat)
-//          - dw_w_mem  : 640  × INT8 (8 filtre × 10×8 DW ağırlığı, [c][kh][kw])
-//          İki yazma portu (loader/FSM'den), kombinasyonel okuma portları
-//          (DepthwiseConv kayan-pencere erişimi gecikmesiz).
-//
-//          NOT (çip akışı): Kombinasyonel okuma = fonksiyonel-önce seçim
-//          (sıralı MAC zamanlamasını basit tutar). ASIC/BRAM eşlemesinde
-//          kayıtlı-okuma + 1 boru hattı aşaması eklenecek (optimizasyon).
-// ============================================================
-
 `timescale 1ns/1ps
 
 module input_buffer
