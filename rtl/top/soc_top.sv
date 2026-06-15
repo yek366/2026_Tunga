@@ -463,8 +463,12 @@ module soc_top #(
     );
 
     // --- AI_MEM: NPU master'in okudugu agirlik+giris bellegi (30 KB) ---
-    // Point-to-point (salt-okunur). AIMEM_INIT ile onyuklenir; FPGA'da
-    // UART1 stream yazma yolu eklenince bus'a tasinabilir (master portu hazir).
+    // Point-to-point (oku+yaz; range-checked, AXI4 lane-aligned). AIMEM_INIT
+    // ile sim onyukleme. KONTRAT: CPU yazilimi NPU CSR'ina INPUT_ADDR/
+    // WEIGHT_ADDR'i AIMEM_BASE (0x0001_0000) tabanli programlamali; aksi
+    // halde NPU aralik disi okur -> ai_mem SLVERR doner.
+    // FPGA'da AI_MEM'i UART1 stream/CPU yazar (yazma portu artik hazir);
+    // bus'a tasinabilir.
     ai_mem #(
         .ADDR_WIDTH (32), .DATA_WIDTH (32), .ID_WIDTH (4),
         .BASE_ADDR  (32'h0001_0000), .SIZE_BYTES (30720), .INIT_FILE (AIMEM_INIT)

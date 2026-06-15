@@ -88,7 +88,8 @@ module npu_tb
 
     assign m_axi_arready = !r_pending;
     assign m_axi_rvalid  = r_pending;
-    assign m_axi_rdata   = {24'h0, ai_mem[ar_addr_q[14:0]]};
+    // AXI4-uyumlu: bayt adres lane'ine (8*addr[1:0]) yerlesir (ai_mem ile ayni)
+    assign m_axi_rdata   = ({24'h0, ai_mem[ar_addr_q[14:0]]}) << (8*ar_addr_q[1:0]);
     assign m_axi_rresp   = 2'b00;
     assign m_axi_rlast   = 1'b1;
     assign m_axi_rid     = '0;

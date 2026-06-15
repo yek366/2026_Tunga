@@ -242,7 +242,13 @@ module axi_controller #(
 
     assign rd_busy  = (r_state != M_IDLE);
     assign rd_valid = (r_state == M_DATA) && m_axi_rvalid;
-    assign rd_byte  = m_axi_rdata[7:0];
+    // AXI4-uyumlu: bayt, adres lane'inde (8*addr[1:0]) gelir → dogru lane'den al.
+    // arsize=0 dar transfer; lane = araddr[1:0] (asagidaki AR ile ayni ifade).
+    logic [31:0] rd_cur_addr;
+    logic [1:0]  rd_lane;
+    assign rd_cur_addr = r_base + {15'h0, r_cnt};   // m_axi_araddr ile ayni
+    assign rd_lane     = rd_cur_addr[1:0];
+    assign rd_byte     = m_axi_rdata[8*rd_lane +: 8];
 
     // AR kanalı
     assign m_axi_arid    = '0;
