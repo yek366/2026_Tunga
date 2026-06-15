@@ -1,16 +1,13 @@
 # TUNGA SoC — Doğrulama Planı
 **Proje:** TUNGA SoC — TEKNOFEST 2026 Çip Tasarım Yarışması  
-**DTR Teslim:** 15 Mayıs 2026  
+**DTR Teslim:** 15 Haziran 2026  
 **Şartname referansı:** Ek-3 Doğrulama Gereksinimleri
-
----
 
 ## 1. Öncelik Seviyeleri
 
 Şartname üç öncelik seviyesi tanımlamaktadır:
 
 | Seviye | Açıklama | Puan Etkisi |
-|--------|----------|-------------|
 | **ZORUNLU** | Olmadan ödül alınamaz | Minimum başarı kriteri |
 | **EN İYİ ÇABA** | Tasarım & doğrulama puanını artırır | %40 havuzundan |
 | **OPSİYONEL** | Tam puan için | %40 havuzundan |
