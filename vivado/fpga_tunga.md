@@ -7,8 +7,14 @@ Takımın tam TUNGA SoC FPGA blok tasarımı. Bir ekip arkadaşı Vivado proje a
 
 ## Proje bilgisi
 - **Vivado:** 2025.2
-- **Part:** `xc7a12ticsg325-1L` (Artix-7 12T) — ⚠ teknotest gate part'ı
-  `xc7k325tffg900-2` (Kintex) ile FARKLI. Hedef kart kararı takımla netleşmeli.
+- **Hedef kart:** Nexys 4 (Artix-7) — constraint `dis_mihraklar.xdc`'den:
+  100 MHz clk (E3), reset C12 (active-low), UART C4/D4, JTAG PMOD JA,
+  QSPI flash pinleri, SPIx4 config. → [`constraints/dis_mihraklar.xdc`](constraints/dis_mihraklar.xdc)
+- **Part:** `.xpr`'de `xc7a12ticsg325-1L` ama ⚠ **constraint Nexys 4 pinleri**
+  (Nexys 4 = `xc7a100t-csg324`). Part ↔ kart UYUMSUZ — takım düzeltmeli.
+  Ayrıca teknotest gate part'ı `xc7k325t` (Kintex) → üçü de farklı, netleşmeli.
+- **Boot/firmware:** arşivde `boot.mem` (62 satır) + `firmware.mem` (10 satır,
+  RISC-V test programı) var (Yağmur sw alanı). `.bit` bitstream arşivde YOK.
 - **Blok tasarım:** `gozlem_design_2`
 - **NPU bu BD'de YOK** — NPU entegre edilince bu block design'a eklenecek
   (CSR → AXI interconnect slave, AI_MEM → bus, IRQ → axi_intc).
